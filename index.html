@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Car Workshop Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class', // or 'media'
+        theme: {
+          extend: {
+            colors: {
+              primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a","950":"#172554"},
+              secondary: {"50":"#f8fafc","100":"#f1f5f9","200":"#e2e8f0","300":"#cbd5e1","400":"#94a3b8","500":"#64748b","600":"#475569","700":"#334155","800":"#1e293b","900":"#0f172a","950":"#020617"}
+            }
+          }
+        }
+      }
+    </script>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react-dom/": "https://esm.sh/react-dom@18.3.1/",
+    "react/": "https://esm.sh/react@18.3.1/",
+    "@heroicons/react/": "https://esm.sh/@heroicons/react@^2.2.0/",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.6.2",
+    "@headlessui/react": "https://esm.sh/@headlessui/react@^1.7.20"
+  }
+}
+</script>
+<style>
+  #global-error-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+    direction: rtl; /* Default to RTL for Arabic messages */
+  }
+  #global-error-container.active {
+    display: flex;
+  }
+  .error-content {
+    background-color: #fff;
+    color: #333;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    max-width: 90%;
+    width: 500px; /* Or a suitable width */
+    text-align: right; 
+  }
+  .error-content h2 {
+    color: #D8000C; /* Red for error title */
+    margin-bottom: 15px;
+    font-size: 1.5em;
+  }
+  .error-content p {
+    margin-bottom: 10px;
+    line-height: 1.6;
+  }
+  .error-content pre {
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-height: 200px;
+    overflow-y: auto;
+    font-size: 0.85em;
+    text-align: left; /* Keep stack traces LTR */
+    direction: ltr;   /* Keep stack traces LTR */
+  }
+  .error-content button {
+    background-color: #3b82f6; /* primary-500 */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-top: 15px;
+  }
+  .error-content button:hover {
+    background-color: #2563eb; /* primary-600 */
+  }
+</style>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <div id="global-error-container">
+      <div class="error-content">
+        <h2>حدث خطأ</h2>
+        <p id="error-message-friendly">عفواً، لقد واجه التطبيق مشكلة غير متوقعة. قد تحتاج إلى تحديث الصفحة أو التحقق من وحدة التحكم لمزيد من التفاصيل.</p>
+        <p id="error-message-technical"></p>
+        <pre id="error-details"></pre>
+        <button onclick="location.reload()">تحديث الصفحة</button>
+      </div>
+    </div>
+    <script type="module" src="./index.tsx"></script>
+    <script>
+      (function() {
+        const errorContainer = document.getElementById('global-error-container');
+        const friendlyMessageElem = document.getElementById('error-message-friendly');
+        const technicalMessageElem = document.getElementById('error-message-technical');
+        const detailsElem = document.getElementById('error-details');
+
+        function displayError(primaryMessage, techMessage, details) {
+          if (errorContainer) {
+            if (friendlyMessageElem) friendlyMessageElem.textContent = primaryMessage;
+            if (technicalMessageElem) technicalMessageElem.textContent = 'رسالة الخطأ: ' + techMessage;
+            if (detailsElem) detailsElem.textContent = details || 'لا توجد تفاصيل إضافية.';
+            errorContainer.classList.add('active');
+          }
+          // Fallback console log
+          console.error("Global Error Handler Caught:", techMessage, details);
+        }
+
+        window.onerror = function (message, source, lineno, colno, error) {
+          let errorDetails = `المصدر: ${source}\nالسطر: ${lineno}, العمود: ${colno}`;
+          if (error && error.stack) {
+            errorDetails += `\n\nStack Trace:\n${error.stack}`;
+          }
+          displayError(
+            'حدث خطأ أثناء تحميل التطبيق. يرجى التحقق من التفاصيل أدناه ومحاولة تحديث الصفحة.',
+            String(message),
+            errorDetails
+          );
+          return true; // Prevents default browser error handling
+        };
+
+        window.addEventListener('unhandledrejection', function (event) {
+          let reason = event.reason;
+          let errorMessage = 'حدث خطأ غير معالج في وعد (Promise).';
+          let errorDetails = '';
+
+          if (reason instanceof Error) {
+            errorMessage = reason.message;
+            errorDetails = reason.stack || 'No stack trace available.';
+          } else {
+            errorDetails = String(reason);
+          }
+          displayError(
+            'واجه التطبيق خطأ غير متوقع أثناء عملية غير متزامنة. يرجى التحقق من التفاصيل ومحاولة تحديث الصفحة.',
+            errorMessage,
+            errorDetails
+          );
+        });
+
+        // Check if React root was properly initialized. This is a fallback.
+        // The main index.tsx will throw an error if #root is not found, caught by window.onerror.
+        // This is more of a sanity check for very early script failures.
+        if (!document.getElementById('root')) {
+            displayError(
+                'فشل تهيئة التطبيق: لم يتم العثور على العنصر الجذري (#root).',
+                'Root element #root not found in the DOM.',
+                'Please ensure the HTML structure in index.html is correct.'
+            );
+        }
+      })();
+    </script>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

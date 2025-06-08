@@ -1,0 +1,6 @@
+{
+  "name": "Car Workshop Management System",
+  "description": "A comprehensive web application for managing car workshop operations, including customers, vehicles, maintenance, invoicing, and reporting. Supports light/dark modes and multiple languages.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
