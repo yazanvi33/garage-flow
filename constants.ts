@@ -71,9 +71,9 @@ export const MOCK_USERS_DATA: Record<string, User> = {
 
 
 export const MOCK_CUSTOMERS: Customer[] = [
-  { id: 'cust-001', internalId: 'CUST-0001', name: 'أحمد محمد', phone: '0501234567', email: 'ahmed@example.com', address: '123 شارع الملك، الرياض', createdAt: '2023-01-15T10:00:00Z', dueAmount: 150, paidAmount: 100, remainingAmount: 50 },
-  { id: 'cust-002', internalId: 'CUST-0002', name: 'Fatima Ali', phone: '0559876543', email: 'fatima@example.com', address: '456 Queen St, Jeddah', createdAt: '2023-02-20T14:30:00Z', dueAmount: 0, paidAmount: 200, remainingAmount: 0 },
-  { id: 'cust-003', internalId: 'CUST-0003', name: 'John Doe', phone: '05XXXXXXXX', createdAt: '2024-07-20T14:30:00Z', dueAmount: 500, paidAmount: 0, remainingAmount: 500}
+  { id: 'cust-001', internalId: 'CUST-0001', name: 'أحمد محمد', phone: '0501234567', email: 'ahmed@example.com', address: '123 شارع الملك، الرياض', createdAt: '2023-01-15T10:00:00Z', openingBalance: 150 },
+  { id: 'cust-002', internalId: 'CUST-0002', name: 'Fatima Ali', phone: '0559876543', email: 'fatima@example.com', address: '456 Queen St, Jeddah', createdAt: '2023-02-20T14:30:00Z', openingBalance: -200 },
+  { id: 'cust-003', internalId: 'CUST-0003', name: 'John Doe', phone: '05XXXXXXXX', createdAt: '2024-07-20T14:30:00Z', openingBalance: 500}
 ];
 
 export const MOCK_VEHICLES: Vehicle[] = [
@@ -90,8 +90,8 @@ export const MOCK_PARTS: SparePart[] = [
 ];
 
 export const MOCK_SUPPLIERS: Supplier[] = [
-    { id: 'supp-001', internalId: 'SUPP-0001', name: 'شركة قطع الغيار المتحدة', phone: '0112345678', email: 'parts@united.com', dueAmount: 1200, paidAmount: 1000, remainingAmount: 200 },
-    { id: 'supp-002', internalId: 'SUPP-0002', name: 'International Auto Parts', phone: '0129876543', contactPerson: 'Mr. Smith', dueAmount: 0, paidAmount: 500, remainingAmount: 0 },
+    { id: 'supp-001', internalId: 'SUPP-0001', name: 'شركة قطع الغيار المتحدة', phone: '0112345678', email: 'parts@united.com', openingBalance: -1200 },
+    { id: 'supp-002', internalId: 'SUPP-0002', name: 'International Auto Parts', phone: '0129876543', contactPerson: 'Mr. Smith', openingBalance: 500 },
 ];
 
 export const MOCK_EMPLOYEES: Employee[] = [
@@ -448,9 +448,7 @@ export const LABELS: Record<string, Record<string, string>> = {
     save: "Save",
     cancel: "Cancel",
     internalId: "Internal ID",
-    dueAmount: "Due Amount",
-    paidAmount: "Paid Amount",
-    remainingAmount: "Remaining Amount",
+    openingBalance: "Opening Balance",
     carsInWorkshop: "Cars in Workshop (Period)",
     carsRepairedThisPeriod: "Cars Repaired (Period)",
     totalExpensesPeriod: "Total Expenses (Period)",
@@ -669,9 +667,7 @@ export const LABELS: Record<string, Record<string, string>> = {
     save: "حفظ",
     cancel: "إلغاء",
     internalId: "الرمز الداخلي",
-    dueAmount: "المبلغ المستحق",
-    paidAmount: "المبلغ المدفوع",
-    remainingAmount: "المبلغ المتبقي",
+    openingBalance: "قيمة حساب أول المدة",
     carsInWorkshop: "سيارات بالورشة (الفترة)",
     carsRepairedThisPeriod: "سيارات تم إصلاحها (الفترة)",
     totalExpensesPeriod: "إجمالي المصروفات (الفترة)",

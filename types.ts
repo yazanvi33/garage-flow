@@ -31,15 +31,13 @@ export interface User {
 
 export interface Customer {
   id: string;
-  internalId: string; 
+  internalId: string;
   name: string;
   phone: string;
   email?: string;
   address?: string;
   createdAt: string;
-  dueAmount?: number; 
-  paidAmount?: number; 
-  remainingAmount?: number; 
+  openingBalance?: number; // قيمة حساب أول المدة
 }
 
 export interface Vehicle {
@@ -86,15 +84,13 @@ export interface InventoryMovement {
 
 export interface Supplier {
   id: string;
-  internalId: string; 
+  internalId: string;
   name: string;
   contactPerson?: string;
   phone: string;
   email?: string;
   address?: string;
-  dueAmount?: number; 
-  paidAmount?: number; 
-  remainingAmount?: number; 
+  openingBalance?: number; // قيمة حساب أول المدة
 }
 
 export interface Employee {

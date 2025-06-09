@@ -17,9 +17,7 @@ const ALL_CUSTOMER_COLUMNS_CONFIG = (getLabel: (key: string) => string, currency
     { header: 'phone', accessor: 'phone', sortable: true },
     { header: 'email', accessor: 'email', sortable: true },
     { header: 'address', accessor: 'address', sortable: true, className: 'text-xs max-w-xs truncate' },
-    { header: 'dueAmount', accessor: (item) => `${(item.dueAmount || 0).toFixed(2)} ${currency.symbol}`, sortable: true, sortKey: 'dueAmount' },
-    { header: 'paidAmount', accessor: (item) => `${(item.paidAmount || 0).toFixed(2)} ${currency.symbol}`, sortable: true, sortKey: 'paidAmount' },
-    { header: 'remainingAmount', accessor: (item) => `${(item.remainingAmount || 0).toFixed(2)} ${currency.symbol}`, sortable: true, sortKey: 'remainingAmount' },
+    { header: 'openingBalance', accessor: (item) => `${(item.openingBalance || 0).toFixed(2)} ${currency.symbol}`, sortable: true, sortKey: 'openingBalance' },
 ];
 
 
@@ -34,8 +32,8 @@ const CustomersPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState<SortConfig<Customer>>({ key: null, direction: null });
 
-  const initialFormData: Omit<Customer, 'id' | 'createdAt' | 'internalId'> = { 
-    name: '', phone: '', email: '', address: '', dueAmount: 0, paidAmount: 0, remainingAmount: 0 
+  const initialFormData: Omit<Customer, 'id' | 'createdAt' | 'internalId'> = {
+    name: '', phone: '', email: '', address: '', openingBalance: 0
   };
   const [formData, setFormData] = useState<Omit<Customer, 'id' | 'createdAt' | 'internalId'>>(initialFormData);
 
@@ -79,7 +77,7 @@ const CustomersPage: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    const numValue = ['dueAmount', 'paidAmount', 'remainingAmount'].includes(name) ? parseFloat(value) || 0 : value;
+    const numValue = ['openingBalance'].includes(name) ? parseFloat(value) || 0 : value;
     setFormData(prev => ({ ...prev, [name]: numValue }));
   };
 
@@ -91,14 +89,12 @@ const CustomersPage: React.FC = () => {
 
   const openModalForEdit = (customer: Customer) => {
     setEditingCustomer(customer);
-    setFormData({ 
-      name: customer.name, 
-      phone: customer.phone, 
-      email: customer.email || '', 
+    setFormData({
+      name: customer.name,
+      phone: customer.phone,
+      email: customer.email || '',
       address: customer.address || '',
-      dueAmount: customer.dueAmount || 0,
-      paidAmount: customer.paidAmount || 0,
-      remainingAmount: customer.remainingAmount || 0,
+      openingBalance: customer.openingBalance || 0,
     });
     setIsModalOpen(true);
   };
@@ -192,19 +188,12 @@ const CustomersPage: React.FC = () => {
             <label htmlFor="address" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('address')}</label>
             <textarea name="address" id="address" value={formData.address || ''} onChange={handleInputChange} rows={2} className={commonInputStyle}></textarea>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label htmlFor="dueAmount" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('dueAmount')}</label>
-              <input type="number" step="any" name="dueAmount" id="dueAmount" value={formData.dueAmount} onChange={handleInputChange} className={commonInputStyle} />
-            </div>
-            <div>
-              <label htmlFor="paidAmount" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('paidAmount')}</label>
-              <input type="number" step="any" name="paidAmount" id="paidAmount" value={formData.paidAmount} onChange={handleInputChange} className={commonInputStyle} />
-            </div>
-            <div>
-              <label htmlFor="remainingAmount" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('remainingAmount')}</label>
-              <input type="number" step="any" name="remainingAmount" id="remainingAmount" value={formData.remainingAmount} onChange={handleInputChange} className={commonInputStyle} />
-            </div>
+          <div>
+            <label htmlFor="openingBalance" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('openingBalance')}</label>
+            <input type="number" step="any" name="openingBalance" id="openingBalance" value={formData.openingBalance} onChange={handleInputChange} className={commonInputStyle} placeholder="0.00" />
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              {getLabel('language') === 'ar' ? 'القيم الموجبة تعني أن العميل مدين لك، والقيم السالبة تعني أن لديه رصيد' : 'Positive values mean customer owes you, negative values mean customer has credit'}
+            </p>
           </div>
           <div className="pt-2 flex justify-end space-x-3 rtl:space-x-reverse">
             <Button type="button" variant="secondary" onClick={closeModal}>{getLabel('cancel')}</Button>
