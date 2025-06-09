@@ -13,7 +13,7 @@ import { Combobox, Transition } from '@headlessui/react';
 import { isDateInRange } from '../utils/dateUtils';
 
 const commonInputStyle = "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm dark:bg-secondary-700 dark:border-secondary-600 dark:text-white";
-const comboboxInputStyle = "w-full py-2 ps-3 pe-10 text-sm leading-5 text-gray-900 dark:text-white border border-gray-300 dark:border-secondary-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-secondary-700";
+const comboboxInputStyle = "w-full py-2 ps-3 pe-10 text-sm leading-5 text-gray-900 dark:text-white border border-gray-300 dark:border-secondary-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-secondary-700 focus:outline-none";
 
 
 const ALL_MAINTENANCE_CARD_COLUMNS_CONFIG = (
@@ -66,6 +66,36 @@ const ALL_MAINTENANCE_CARD_COLUMNS_CONFIG = (
     className: 'text-xs',
     sortable: false
   },
+  {
+    header: 'assignedTechnicians',
+    accessor: (item) => item.assignedEmployeeIds.map(id => employeesMap[id]?.name || id).join(', ') || '-',
+    className: 'text-xs max-w-xs truncate',
+    sortable: false
+  },
+
+  {
+    header: 'tasks',
+    accessor: (item) => {
+      const completed = item.tasks.filter(task => task.completed).length;
+      const total = item.tasks.length;
+      return total > 0 ? `${completed}/${total}` : '-';
+    },
+    className: 'text-xs',
+    sortable: false,
+    render: (item) => {
+      const completed = item.tasks.filter(task => task.completed).length;
+      const total = item.tasks.length;
+      if (total === 0) return <span className="text-gray-400">-</span>;
+
+      const percentage = (completed / total) * 100;
+      let colorClass = 'text-red-600 dark:text-red-400';
+      if (percentage === 100) colorClass = 'text-green-600 dark:text-green-400';
+      else if (percentage >= 50) colorClass = 'text-yellow-600 dark:text-yellow-400';
+
+      return <span className={colorClass}>{completed}/{total}</span>;
+    }
+  },
+  { header: 'reportedIssues', accessor: (item) => (item.reportedIssues || []).join(', ') || '-', className: 'text-xs max-w-xs truncate', sortable: false},
   { header: 'faultDescription', accessor: 'faultDescription', className: 'text-xs max-w-xs truncate', sortable: true},
 ];
 
@@ -83,14 +113,15 @@ const MaintenanceCardsPage: React.FC = () => {
   const [sortConfig, setSortConfig] = useState<SortConfig<MaintenanceCard>>({ key: null, direction: null });
   const [searchTerm, setSearchTerm] = useState('');
 
-  const initialFormData: Omit<MaintenanceCard, 'id' | 'internalId' | 'dateCreated' | 'dateCompleted' | 'tasks' | 'actualCost' > = {
+  const initialFormData: Omit<MaintenanceCard, 'id' | 'internalId' | 'dateCreated' | 'tasks' > & { reportedIssuesText: string } = {
     vehicleId: '',
     customerId: '',
     status: 'Pending',
     reportedIssues: [],
+    reportedIssuesText: '', // نص الأعطال كما يكتبه المستخدم
     assignedEmployeeIds: [],
     notes: '',
-    estimatedCost: 0,
+    dateCompleted: undefined,
     faultDescription: '',
     causeOfFailure: '',
     odometerIn: undefined,
@@ -180,10 +211,21 @@ const MaintenanceCardsPage: React.FC = () => {
     const { name, value } = e.target;
     
     if (name === 'reportedIssues') {
-        setFormData(prev => ({ ...prev, reportedIssues: value.split(',').map(s => s.trim()).filter(Boolean) }));
+        // حفظ النص كما هو بدون تقسيم فوري
+        setFormData(prev => ({ ...prev, reportedIssuesText: value }));
     } else {
-        const numValue = ['odometerIn', 'odometerOut', 'estimatedCost'].includes(name) ? (value ? parseFloat(value) : undefined) : value;
-        setFormData(prev => ({ ...prev, [name]: numValue }));
+        const numValue = ['odometerIn', 'odometerOut'].includes(name) ? (value ? parseFloat(value) : undefined) : value;
+
+        // إذا تم تغيير الحالة إلى "مكتملة" وليس هناك تاريخ إنجاز، أضف التاريخ الحالي
+        if (name === 'status' && value === 'Completed') {
+            setFormData(prev => ({
+                ...prev,
+                [name]: numValue,
+                dateCompleted: prev.dateCompleted || new Date().toISOString()
+            }));
+        } else {
+            setFormData(prev => ({ ...prev, [name]: numValue }));
+        }
     }
   };
   
@@ -221,9 +263,10 @@ const MaintenanceCardsPage: React.FC = () => {
       customerId: card.customerId,
       status: card.status,
       reportedIssues: card.reportedIssues || [],
+      reportedIssuesText: (card.reportedIssues || []).join(', '), // تحويل المصفوفة إلى نص
       assignedEmployeeIds: card.assignedEmployeeIds || [],
       notes: card.notes || '',
-      estimatedCost: card.estimatedCost,
+      dateCompleted: card.dateCompleted,
       faultDescription: card.faultDescription || '',
       causeOfFailure: card.causeOfFailure || '',
       odometerIn: card.odometerIn,
@@ -253,8 +296,13 @@ const MaintenanceCardsPage: React.FC = () => {
 
     const cardData: Partial<MaintenanceCard> = {
         ...formData,
+        reportedIssues: formData.reportedIssuesText
+            ? formData.reportedIssuesText.split(',').map(s => s.trim()).filter(Boolean)
+            : [],
         tasks: currentTasks,
     };
+    // إزالة reportedIssuesText من البيانات المحفوظة
+    delete (cardData as any).reportedIssuesText;
 
     if (editingCard) {
       setCards(prev => prev.map(c => c.id === editingCard.id ? { ...editingCard, ...cardData } : c));
@@ -385,7 +433,7 @@ const MaintenanceCardsPage: React.FC = () => {
       <Table columns={displayedTableColumns} data={sortedCards} keyExtractor={(card) => card.id} sortConfig={sortConfig} onSort={setSortConfig} />
       
       <Modal isOpen={isModalOpen} onClose={closeModal} title={editingCard ? getLabel('editMaintenanceCard') : getLabel('addNewMaintenanceCard')} size="3xl">
-        <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto p-1">
+        <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto custom-scroll p-1">
           {editingCard && (
              <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('internalId')}</label>
@@ -421,8 +469,8 @@ const MaintenanceCardsPage: React.FC = () => {
                                 }}
                                 placeholder={getLabel('searchOrSelectCustomer') || 'Search or select customer'}
                             />
-                            <Combobox.Button className="absolute inset-y-0 end-0 flex items-center pe-2 rtl:ps-2 rtl:inset-y-0 rtl:start-0">
-                                <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                            <Combobox.Button className="absolute inset-y-0 end-0 flex items-center pe-3 rtl:ps-3 rtl:inset-y-0 rtl:start-0 rtl:end-auto">
+                                <ChevronUpDownIcon className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" aria-hidden="true" />
                             </Combobox.Button>
                         </div>
                         <Transition
@@ -432,7 +480,7 @@ const MaintenanceCardsPage: React.FC = () => {
                             leaveTo="opacity-0"
                             afterLeave={() => setCustomerInputQuery('')}
                         >
-                            <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-secondary-700 py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm z-10">
+                            <Combobox.Options className="absolute mt-1 max-h-60 w-full max-w-sm overflow-auto scrollbar-thin rounded-md bg-white dark:bg-secondary-700 py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none sm:text-sm z-50">
                                 {filteredCustomersForCombobox.length === 0 && customerInputQuery !== '' ? (
                                     <div className="relative cursor-default select-none px-4 py-2 text-gray-700 dark:text-gray-300">
                                         {getLabel('noDataFound')}
@@ -487,7 +535,7 @@ const MaintenanceCardsPage: React.FC = () => {
                 </div>
            </div>
             <div><label htmlFor="reportedIssues" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('reportedIssues')} ({language === 'ar' ? 'افصل بينها بفاصلة' : 'Comma separated'})</label>
-                <textarea name="reportedIssues" id="reportedIssues" value={(formData.reportedIssues || []).join(', ')} onChange={handleInputChange} rows={2} className={commonInputStyle}></textarea>
+                <textarea name="reportedIssues" id="reportedIssues" value={formData.reportedIssuesText || ''} onChange={handleInputChange} rows={2} className={commonInputStyle} placeholder="مثال: تغيير زيت وفلتر, فحص الفرامل, صوت غريب من المحرك"></textarea>
             </div>
             <div><label htmlFor="faultDescription" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('faultDescription')}</label>
                 <textarea name="faultDescription" id="faultDescription" value={formData.faultDescription || ''} onChange={handleInputChange} rows={3} className={commonInputStyle}></textarea>
@@ -517,33 +565,93 @@ const MaintenanceCardsPage: React.FC = () => {
                     </select>
                 </div>
             </div>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div><label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('status')}</label>
                     <select name="status" id="status" value={formData.status} onChange={handleInputChange} required className={commonInputStyle}>
                         {(['Pending', 'In Progress', 'Completed', 'Cancelled'] as MaintenanceCard['status'][]).map(s => <option key={s} value={s}>{getLabel(s.replace(/\s/g,''))}</option>)}
                     </select>
                 </div>
-                <div><label htmlFor="estimatedCost" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('estimatedCost')} ({currency.symbol})</label>
-                    <input type="number" step="any" name="estimatedCost" id="estimatedCost" value={formData.estimatedCost || ''} onChange={handleInputChange} className={commonInputStyle} />
-                </div>
+
+                {/* تاريخ الإنجاز - يظهر فقط للبطاقات المكتملة */}
+                {formData.status === 'Completed' && (
+                    <div><label htmlFor="dateCompleted" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('dateCompleted')}</label>
+                        <input type="datetime-local" name="dateCompleted" id="dateCompleted" value={formData.dateCompleted ? new Date(formData.dateCompleted).toISOString().slice(0, 16) : ''} onChange={handleInputChange} className={commonInputStyle} />
+                    </div>
+                )}
             </div>
-             <div><label htmlFor="assignedEmployeeIds" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('assignedTechnicians')}</label>
-                <select 
-                    name="assignedEmployeeIds" 
-                    id="assignedEmployeeIds" 
-                    multiple 
-                    value={formData.assignedEmployeeIds} 
-                    onChange={(e) => {
-                        const selectedIds = Array.from(e.target.selectedOptions, option => option.value);
-                        setFormData(prev => ({ ...prev, assignedEmployeeIds: selectedIds }));
-                    }}
-                    className={`${commonInputStyle} h-24`}
-                >
-                    {employees.filter(emp => emp.role === 'Technician').map(emp => <option key={emp.id} value={emp.id}>{emp.name}</option>)}
-                </select>
+             <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    {getLabel('assignedTechnicians')}
+                </label>
+
+                {employees.filter(emp => emp.role === 'Technician').length === 0 ? (
+                    <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                        {language === 'ar' ? 'لا يوجد فنيين متاحين' : 'No technicians available'}
+                    </p>
+                ) : (
+                    <div className="space-y-2 max-h-32 overflow-y-auto scrollbar-thin border border-gray-300 dark:border-secondary-600 rounded-md p-3 bg-gray-50 dark:bg-secondary-700">
+                        {employees.filter(emp => emp.role === 'Technician').map(emp => (
+                            <label key={emp.id} className="flex items-center cursor-pointer hover:bg-gray-100 dark:hover:bg-secondary-600 p-2 rounded-md transition-colors">
+                                <input
+                                    type="checkbox"
+                                    checked={formData.assignedEmployeeIds.includes(emp.id)}
+                                    onChange={(e) => {
+                                        if (e.target.checked) {
+                                            setFormData(prev => ({
+                                                ...prev,
+                                                assignedEmployeeIds: [...prev.assignedEmployeeIds, emp.id]
+                                            }));
+                                        } else {
+                                            setFormData(prev => ({
+                                                ...prev,
+                                                assignedEmployeeIds: prev.assignedEmployeeIds.filter(id => id !== emp.id)
+                                            }));
+                                        }
+                                    }}
+                                    className="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500 me-3 dark:border-secondary-500 dark:bg-secondary-600 dark:checked:bg-primary-500"
+                                />
+                                <div className="flex-1">
+                                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{emp.name}</span>
+                                    <span className="text-xs text-gray-500 dark:text-gray-400 ms-2">({emp.internalId})</span>
+                                </div>
+                            </label>
+                        ))}
+                    </div>
+                )}
+
+                {formData.assignedEmployeeIds.length > 0 && (
+                    <div className="mt-3">
+                        <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                            {language === 'ar' ? `تم اختيار ${formData.assignedEmployeeIds.length} فني` : `${formData.assignedEmployeeIds.length} technician(s) selected`}
+                        </p>
+                        <div className="flex flex-wrap gap-1">
+                            {formData.assignedEmployeeIds.map(empId => {
+                                const emp = employees.find(e => e.id === empId);
+                                return emp ? (
+                                    <span key={empId} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200">
+                                        {emp.name}
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    assignedEmployeeIds: prev.assignedEmployeeIds.filter(id => id !== empId)
+                                                }));
+                                            }}
+                                            className="ms-1 text-primary-600 hover:text-primary-800 dark:text-primary-300 dark:hover:text-primary-100 font-bold"
+                                            title={language === 'ar' ? 'إزالة' : 'Remove'}
+                                        >
+                                            ×
+                                        </button>
+                                    </span>
+                                ) : null;
+                            })}
+                        </div>
+                    </div>
+                )}
             </div>
              <div><label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('tasks')}</label>
-                <div className="space-y-2 mt-1">
+                <div className="space-y-2 mt-1 max-h-40 overflow-y-auto scrollbar-thin">
                     {currentTasks.map(task => (
                         <div key={task.id} className="flex items-center justify-between bg-gray-50 dark:bg-secondary-600 p-2 rounded-md">
                             <label className="flex items-center">

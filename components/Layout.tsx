@@ -14,7 +14,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 dark:bg-secondary-900 p-6">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto custom-scroll bg-gray-100 dark:bg-secondary-900 p-6">
           {children || <Outlet />} {/* Changed back to Outlet, or render children if passed explicitly */}
         </main>
       </div>

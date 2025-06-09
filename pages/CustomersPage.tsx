@@ -18,15 +18,41 @@ const ALL_CUSTOMER_COLUMNS_CONFIG = (getLabel: (key: string) => string, currency
     { header: 'email', accessor: 'email', sortable: true },
     { header: 'address', accessor: 'address', sortable: true, className: 'text-xs max-w-xs truncate' },
     { header: 'openingBalance', accessor: (item) => `${(item.openingBalance || 0).toFixed(2)} ${currency.symbol}`, sortable: true, sortKey: 'openingBalance' },
+    { header: 'totalInvoiced', accessor: (item) => `${(item.totalInvoiced || 0).toFixed(2)} ${currency.symbol}`, sortable: true, sortKey: 'totalInvoiced' },
+    { header: 'totalPaid', accessor: (item) => `${(item.totalPaid || 0).toFixed(2)} ${currency.symbol}`, sortable: true, sortKey: 'totalPaid' },
+    { header: 'remainingBalance', accessor: (item) => `${(item.remainingBalance || 0).toFixed(2)} ${currency.symbol}`, sortable: true, sortKey: 'remainingBalance',
+      render: (item) => {
+        const balance = (item.remainingBalance || 0);
+        const colorClass = balance > 0 ? 'text-red-600 dark:text-red-400' : balance < 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-gray-400';
+        return <span className={colorClass}>{balance.toFixed(2)} {currency.symbol}</span>;
+      }
+    },
 ];
 
+
+// دالة لحساب القيم المالية للعميل
+const calculateCustomerFinancials = (customer: Customer): Customer => {
+  // هنا يمكن حساب القيم من الفواتير الفعلية
+  // حالياً نستخدم القيم الموجودة أو نحسبها من البيانات التجريبية
+  const totalInvoiced = customer.totalInvoiced || 0;
+  const totalPaid = customer.totalPaid || 0;
+  const openingBalance = customer.openingBalance || 0;
+  const remainingBalance = openingBalance + totalInvoiced - totalPaid;
+
+  return {
+    ...customer,
+    totalInvoiced,
+    totalPaid,
+    remainingBalance
+  };
+};
 
 const CustomersPage: React.FC = () => {
   const context = useContext(AppContext);
   if (!context) return <p>Loading context...</p>;
   const { getLabel, language, currency } = context;
 
-  const [customers, setCustomers] = useState<Customer[]>(MOCK_CUSTOMERS);
+  const [customers, setCustomers] = useState<Customer[]>(MOCK_CUSTOMERS.map(calculateCustomerFinancials));
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -114,8 +140,11 @@ const CustomersPage: React.FC = () => {
         internalId: `CUST-${String(Date.now()).slice(-4)}`,
         ...formData,
         createdAt: new Date().toISOString(),
+        totalInvoiced: 0, // العميل الجديد لا يوجد له فواتير
+        totalPaid: 0, // العميل الجديد لم يدفع شيء
+        remainingBalance: formData.openingBalance || 0 // الرصيد المتبقي = قيمة حساب أول المدة
       };
-      setCustomers(prev => [newCustomer, ...prev]);
+      setCustomers(prev => [calculateCustomerFinancials(newCustomer), ...prev]);
     }
     closeModal();
   };
@@ -165,7 +194,7 @@ const CustomersPage: React.FC = () => {
       <input type="text" placeholder={`${getLabel('search')}...`} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={commonInputStyle} />
       <Table columns={displayedTableColumns} data={filteredAndSortedCustomers} keyExtractor={(customer) => customer.id} sortConfig={sortConfig} onSort={setSortConfig} />
       <Modal isOpen={isModalOpen} onClose={closeModal} title={editingCustomer ? `${getLabel('edit')} ${getLabel('customer')}` : getLabel('addNewCustomer')} size="lg">
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto custom-scroll">
           {editingCustomer && (
             <div>
                 <label htmlFor="internalId_display" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('internalId')}</label>

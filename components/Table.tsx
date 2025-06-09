@@ -52,7 +52,7 @@ const Table = <T extends object>({ columns, data, onRowClick, keyExtractor, sort
 
 
   return (
-    <div className="overflow-x-auto shadow-md sm:rounded-lg bg-white dark:bg-secondary-800 ring-1 ring-gray-200 dark:ring-secondary-700">
+    <div className="overflow-x-auto table-scroll shadow-md sm:rounded-lg bg-white dark:bg-secondary-800 ring-1 ring-gray-200 dark:ring-secondary-700">
       <table className="w-full text-sm text-left rtl:text-right text-gray-700 dark:text-gray-300">
         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-secondary-700 dark:text-gray-400">
           <tr>

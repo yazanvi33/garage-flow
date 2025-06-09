@@ -22,6 +22,7 @@ import SecondaryWarehousePage from './pages/SecondaryWarehousePage';
 import { User, UserRole, DateRange, Currency } from './types';
 import { AppContext, AppContextType, Theme, Language } from './context/AppContext';
 import { MOCK_USERS_DATA, MOCK_LOGGED_IN_USER_ID, LABELS, DEFAULT_CURRENCY, CURRENCY_OPTIONS } from './constants';
+import './src/styles/scrollbar.css';
 
 interface ProtectedRouteProps {
   children: JSX.Element;

@@ -71,9 +71,43 @@ export const MOCK_USERS_DATA: Record<string, User> = {
 
 
 export const MOCK_CUSTOMERS: Customer[] = [
-  { id: 'cust-001', internalId: 'CUST-0001', name: 'أحمد محمد', phone: '0501234567', email: 'ahmed@example.com', address: '123 شارع الملك، الرياض', createdAt: '2023-01-15T10:00:00Z', openingBalance: 150 },
-  { id: 'cust-002', internalId: 'CUST-0002', name: 'Fatima Ali', phone: '0559876543', email: 'fatima@example.com', address: '456 Queen St, Jeddah', createdAt: '2023-02-20T14:30:00Z', openingBalance: -200 },
-  { id: 'cust-003', internalId: 'CUST-0003', name: 'John Doe', phone: '05XXXXXXXX', createdAt: '2024-07-20T14:30:00Z', openingBalance: 500}
+  {
+    id: 'cust-001',
+    internalId: 'CUST-0001',
+    name: 'أحمد محمد',
+    phone: '0501234567',
+    email: 'ahmed@example.com',
+    address: '123 شارع الملك، الرياض',
+    createdAt: '2023-01-15T10:00:00Z',
+    openingBalance: 150,
+    totalInvoiced: 1200,
+    totalPaid: 800,
+    remainingBalance: 550 // 150 + 1200 - 800
+  },
+  {
+    id: 'cust-002',
+    internalId: 'CUST-0002',
+    name: 'Fatima Ali',
+    phone: '0559876543',
+    email: 'fatima@example.com',
+    address: '456 Queen St, Jeddah',
+    createdAt: '2023-02-20T14:30:00Z',
+    openingBalance: -200,
+    totalInvoiced: 500,
+    totalPaid: 600,
+    remainingBalance: -300 // -200 + 500 - 600
+  },
+  {
+    id: 'cust-003',
+    internalId: 'CUST-0003',
+    name: 'John Doe',
+    phone: '05XXXXXXXX',
+    createdAt: '2024-07-20T14:30:00Z',
+    openingBalance: 500,
+    totalInvoiced: 0,
+    totalPaid: 0,
+    remainingBalance: 500 // 500 + 0 - 0
+  }
 ];
 
 export const MOCK_VEHICLES: Vehicle[] = [
@@ -90,15 +124,39 @@ export const MOCK_PARTS: SparePart[] = [
 ];
 
 export const MOCK_SUPPLIERS: Supplier[] = [
-    { id: 'supp-001', internalId: 'SUPP-0001', name: 'شركة قطع الغيار المتحدة', phone: '0112345678', email: 'parts@united.com', openingBalance: -1200 },
-    { id: 'supp-002', internalId: 'SUPP-0002', name: 'International Auto Parts', phone: '0129876543', contactPerson: 'Mr. Smith', openingBalance: 500 },
+    {
+        id: 'supp-001',
+        internalId: 'SUPP-0001',
+        name: 'شركة قطع الغيار المتحدة',
+        phone: '0112345678',
+        email: 'parts@united.com',
+        openingBalance: -1200, // كنا مدينين لهم بـ 1200
+        totalInvoiced: 3500, // إجمالي فواتيرهم
+        totalPaid: 2800, // ما دفعناه لهم
+        remainingBalance: -500 // -1200 + 3500 - 2800 = -500 (ما زلنا مدينين لهم)
+    },
+    {
+        id: 'supp-002',
+        internalId: 'SUPP-0002',
+        name: 'International Auto Parts',
+        phone: '0129876543',
+        contactPerson: 'Mr. Smith',
+        openingBalance: 500, // كانوا مدينين لنا بـ 500
+        totalInvoiced: 1200, // إجمالي فواتيرهم
+        totalPaid: 1500, // ما دفعناه لهم
+        remainingBalance: 200 // 500 + 1200 - 1500 = 200 (مدينين لنا)
+    },
 ];
 
 export const MOCK_EMPLOYEES: Employee[] = [
     { id: 'emp-001', internalId: 'EMP-0001', name: 'علي حسن', role: 'Technician', phone: '0511111111', hireDate: '2022-05-01', salary: 6000 },
     { id: 'emp-002', internalId: 'EMP-0002', name: 'Sarah Miller', role: 'Service Advisor', phone: '0522222222', hireDate: '2021-11-15', salary: 7500 },
     { id: 'emp-003', internalId: 'EMP-0003', name: 'خالد عبدالله', role: 'Manager', phone: '0533333333', hireDate: '2020-01-10', salary: 12000 },
-    { id: 'emp-accountant-01', internalId: 'EMP-ACC01', name: 'نورة المحاسبة', role: 'Accountant', phone: '0544444444', hireDate: '2021-01-10', salary: 8000}
+    { id: 'emp-accountant-01', internalId: 'EMP-ACC01', name: 'نورة المحاسبة', role: 'Accountant', phone: '0544444444', hireDate: '2021-01-10', salary: 8000},
+    { id: 'emp-004', internalId: 'EMP-0004', name: 'أحمد محمد', role: 'Technician', phone: '0555555555', hireDate: '2023-03-15', salary: 5500 },
+    { id: 'emp-005', internalId: 'EMP-0005', name: 'محمد العلي', role: 'Technician', phone: '0566666666', hireDate: '2023-06-01', salary: 5800 },
+    { id: 'emp-006', internalId: 'EMP-0006', name: 'Omar Hassan', role: 'Technician', phone: '0577777777', hireDate: '2022-09-10', salary: 6200 },
+    { id: 'emp-007', internalId: 'EMP-0007', name: 'فيصل الأحمد', role: 'Technician', phone: '0588888888', hireDate: '2023-01-20', salary: 5700 }
 ];
 
 export const MOCK_MAINTENANCE_CARDS: MaintenanceCard[] = [
@@ -449,6 +507,9 @@ export const LABELS: Record<string, Record<string, string>> = {
     cancel: "Cancel",
     internalId: "Internal ID",
     openingBalance: "Opening Balance",
+    totalInvoiced: "Total Invoiced",
+    totalPaid: "Total Paid",
+    remainingBalance: "Remaining Balance",
     carsInWorkshop: "Cars in Workshop (Period)",
     carsRepairedThisPeriod: "Cars Repaired (Period)",
     totalExpensesPeriod: "Total Expenses (Period)",
@@ -668,6 +729,9 @@ export const LABELS: Record<string, Record<string, string>> = {
     cancel: "إلغاء",
     internalId: "الرمز الداخلي",
     openingBalance: "قيمة حساب أول المدة",
+    totalInvoiced: "المبلغ المستحق",
+    totalPaid: "المبلغ المدفوع",
+    remainingBalance: "المبلغ المتبقي",
     carsInWorkshop: "سيارات بالورشة (الفترة)",
     carsRepairedThisPeriod: "سيارات تم إصلاحها (الفترة)",
     totalExpensesPeriod: "إجمالي المصروفات (الفترة)",

@@ -38,6 +38,10 @@ export interface Customer {
   address?: string;
   createdAt: string;
   openingBalance?: number; // قيمة حساب أول المدة
+  // الحقول المحسوبة - لا تُدخل يدوياً
+  totalInvoiced?: number; // إجمالي الفواتير الصادرة
+  totalPaid?: number; // إجمالي المبالغ المدفوعة
+  remainingBalance?: number; // الرصيد المتبقي (openingBalance + totalInvoiced - totalPaid)
 }
 
 export interface Vehicle {
@@ -91,6 +95,10 @@ export interface Supplier {
   email?: string;
   address?: string;
   openingBalance?: number; // قيمة حساب أول المدة
+  // الحقول المحسوبة - لا تُدخل يدوياً
+  totalInvoiced?: number; // إجمالي الفواتير الواردة من المورد
+  totalPaid?: number; // إجمالي المبالغ المدفوعة للمورد
+  remainingBalance?: number; // الرصيد المتبقي (openingBalance + totalInvoiced - totalPaid)
 }
 
 export interface Employee {
