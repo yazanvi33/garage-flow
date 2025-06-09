@@ -115,7 +115,7 @@ const Header: React.FC = () => {
           <Menu as="div" className="relative inline-block text-left">
             <div><Menu.Button className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 dark:focus:ring-offset-secondary-800 focus:ring-primary-500"><UserCircleIcon className="h-8 w-8 text-gray-600 dark:text-gray-300" /></Menu.Button></div>
             <Transition as={Fragment} enter="transition ease-out duration-100" enterFrom="transform opacity-0 scale-95" enterTo="transform opacity-100 scale-100" leave="transition ease-in duration-75" leaveFrom="transform opacity-100 scale-100" leaveTo="transform opacity-0 scale-95">
-              <Menu.Items className="origin-top-right absolute right-0 mt-2 w-64 rounded-md shadow-lg py-1 bg-white dark:bg-secondary-700 ring-1 ring-black dark:ring-secondary-600 ring-opacity-5 focus:outline-none z-20">
+              <Menu.Items className={`absolute mt-2 w-64 rounded-md shadow-lg py-1 bg-white dark:bg-secondary-700 ring-1 ring-black dark:ring-secondary-600 ring-opacity-5 focus:outline-none z-20 ${language === 'ar' ? 'origin-top-left left-0' : 'origin-top-right right-0'}`}>
                 <div className="px-4 py-3">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">{currentUser.name}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{currentUser.username}</p>
