@@ -38,7 +38,7 @@ const SidebarNavItem: React.FC<{ item: NavItem; isChild?: boolean }> = ({ item, 
         end={item.path === '/'} // Use 'end' prop for exact matching on index/home routes in v6
       >
         <item.icon className={`w-6 h-6 ${language === 'ar' ? 'ms-3' : 'mr-3'}`} />
-        <span className="flex-1">{label}</span>
+        <span className="flex-1 whitespace-nowrap">{label}</span>
         {item.children && item.children.length > 0 && (
           isSubmenuOpen ? <span className="w-4 h-4">^</span> : <span className="w-4 h-4">V</span>
         )}
@@ -66,7 +66,7 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-64 bg-white dark:bg-secondary-800 shadow-md flex flex-col transition-colors duration-300">
+    <aside className="w-64 min-w-64 bg-white dark:bg-secondary-800 shadow-md flex flex-col transition-colors duration-300">
       <div className="p-4 border-b dark:border-secondary-700">
         <Link to="/" className="text-2xl font-bold text-primary-600 dark:text-primary-400">
           {appName}

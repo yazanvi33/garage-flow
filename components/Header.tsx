@@ -138,7 +138,7 @@ const Header: React.FC = () => {
                          )}
                       </Popover.Button>
                       <Transition as={Fragment} enter="transition ease-out duration-100" enterFrom="opacity-0 translate-y-1" enterTo="opacity-100 translate-y-0" leave="transition ease-in duration-75" leaveFrom="opacity-100 translate-y-0" leaveTo="opacity-0 translate-y-1">
-                        <Popover.Panel className={`absolute -top-8 z-10 mt-0 w-40 transform rounded-md bg-white dark:bg-secondary-700 shadow-lg ring-1 ring-black dark:ring-secondary-600 ring-opacity-5 ${language === 'ar' ? 'right-0' : 'left-0'}`}>
+                        <Popover.Panel className={`absolute top-0 z-10 w-40 transform rounded-md bg-white dark:bg-secondary-700 shadow-lg ring-1 ring-black dark:ring-secondary-600 ring-opacity-5 ${language === 'ar' ? '-left-40 -ml-2' : '-right-40 -mr-2'}`}>
                            <div className="py-1">
                             {THEME_OPTIONS.map((themeOpt) => (
                                 <button key={themeOpt.value} onClick={() => setTheme(themeOpt.value as Theme)} 
@@ -168,7 +168,7 @@ const Header: React.FC = () => {
                          )}
                       </Popover.Button>
                       <Transition as={Fragment} enter="transition ease-out duration-100" enterFrom="opacity-0 translate-y-1" enterTo="opacity-100 translate-y-0" leave="transition ease-in duration-75" leaveFrom="opacity-100 translate-y-0" leaveTo="opacity-0 translate-y-1">
-                        <Popover.Panel className={`absolute -top-8 z-10 mt-0 w-40 transform rounded-md bg-white dark:bg-secondary-700 shadow-lg ring-1 ring-black dark:ring-secondary-600 ring-opacity-5 ${language === 'ar' ? 'right-0' : 'left-0'}`}>
+                        <Popover.Panel className={`absolute top-0 z-10 w-40 transform rounded-md bg-white dark:bg-secondary-700 shadow-lg ring-1 ring-black dark:ring-secondary-600 ring-opacity-5 ${language === 'ar' ? '-left-40 -ml-2' : '-right-40 -mr-2'}`}>
                            <div className="py-1">
                             {LANGUAGE_OPTIONS.map((langOpt) => (
                                 <button key={langOpt.code} onClick={() => setLanguage(langOpt.code as 'en' | 'ar')} 
@@ -197,7 +197,7 @@ const Header: React.FC = () => {
                          )}
                       </Popover.Button>
                       <Transition as={Fragment} enter="transition ease-out duration-100" enterFrom="opacity-0 translate-y-1" enterTo="opacity-100 translate-y-0" leave="transition ease-in duration-75" leaveFrom="opacity-100 translate-y-0" leaveTo="opacity-0 translate-y-1">
-                        <Popover.Panel className={`absolute -top-8 z-10 mt-0 w-52 transform rounded-md bg-white dark:bg-secondary-700 shadow-lg ring-1 ring-black dark:ring-secondary-600 ring-opacity-5 ${language === 'ar' ? 'right-0' : 'left-0'}`}>
+                        <Popover.Panel className={`absolute top-0 z-10 w-52 transform rounded-md bg-white dark:bg-secondary-700 shadow-lg ring-1 ring-black dark:ring-secondary-600 ring-opacity-5 ${language === 'ar' ? '-left-52 -ml-2' : '-right-52 -mr-2'}`}>
                            <div className="py-1">
                             {CURRENCY_OPTIONS.map((currOpt) => (
                                 <button key={currOpt.code} onClick={() => setCurrency(currOpt)} 
