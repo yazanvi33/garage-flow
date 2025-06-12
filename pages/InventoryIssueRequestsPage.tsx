@@ -526,7 +526,7 @@ const InventoryIssueRequestsPage: React.FC = () => {
 
       {/* Create/Edit Modal */}
       <Modal isOpen={isModalOpen} onClose={closeModal} title={editingRequest ? getLabel('editInventoryIssueRequest') : getLabel('addNewInventoryIssueRequest')} size="4xl">
-        <form onSubmit={handleSubmit} className="space-y-4 max-h-[80vh] overflow-y-auto p-1">
+        <form onSubmit={handleSubmit} className="space-y-4 max-h-[80vh] overflow-y-auto overflow-x-hidden custom-scroll p-1">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
                 <label htmlFor="dateCreated" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('requestDate')}</label>
@@ -554,12 +554,12 @@ const InventoryIssueRequestsPage: React.FC = () => {
                             onChange={(event) => setMaintenanceCardInputQuery(event.target.value)}
                             placeholder={getLabel('selectMaintenanceCardOptional')}
                         />
-                        <Combobox.Button className="absolute inset-y-0 end-0 flex items-center pe-2 rtl:ps-2 rtl:inset-y-0 rtl:start-0">
-                            <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                        <Combobox.Button className="absolute inset-y-0 end-0 flex items-center pe-3 rtl:ps-3 rtl:inset-y-0 rtl:start-0 rtl:end-auto">
+                            <ChevronUpDownIcon className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" aria-hidden="true" />
                         </Combobox.Button>
                     </div>
                     <Transition as={Fragment} leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0" afterLeave={() => setMaintenanceCardInputQuery('')}>
-                        <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-secondary-700 py-1 text-base shadow-lg ring-1 ring-black/5 dark:ring-white/10 focus:outline-none sm:text-sm z-20">
+                        <Combobox.Options className="absolute mt-1 max-h-60 w-80 sm:w-96 overflow-auto scrollbar-thin rounded-md bg-white dark:bg-secondary-700 py-1 text-base shadow-lg ring-1 ring-black/5 dark:ring-white/10 focus:outline-none sm:text-sm z-50 left-0 right-auto">
                             {filteredMaintenanceCardsForCombobox.length === 0 && maintenanceCardInputQuery !== '' ? (
                                 <div className="relative cursor-default select-none px-4 py-2 text-gray-700 dark:text-gray-300">{getLabel('noDataFound')}</div>
                             ) : (
@@ -567,9 +567,17 @@ const InventoryIssueRequestsPage: React.FC = () => {
                                     <Combobox.Option key={mc.id} value={mc} className={({ active }) => `relative cursor-default select-none py-2 ps-10 pe-4 ${language === 'ar' ? 'text-right ps-4 pe-10' : 'text-left ps-10 pe-4'} ${active ? 'bg-primary-600 text-white' : 'text-gray-900 dark:text-white'}`}>
                                         {({ selected }) => (
                                             <>
-                                                <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
-                                                    {mc.internalId} - {vehiclesMap[mc.vehicleId]?.make} {vehiclesMap[mc.vehicleId]?.model} ({vehiclesMap[mc.vehicleId]?.licensePlate}) - {customersMap[mc.customerId]?.name} - {new Date(mc.dateCreated).toLocaleDateString(language)}
-                                                </span>
+                                                <div className={`block ${selected ? 'font-medium' : 'font-normal'}`}>
+                                                    <div className="font-medium text-gray-900 dark:text-white truncate">
+                                                        {mc.internalId} - {vehiclesMap[mc.vehicleId]?.make} {vehiclesMap[mc.vehicleId]?.model}
+                                                    </div>
+                                                    <div className="text-sm text-gray-600 dark:text-gray-300 mt-1 truncate">
+                                                        {customersMap[mc.customerId]?.name}
+                                                    </div>
+                                                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                                                        {vehiclesMap[mc.vehicleId]?.licensePlate} • {new Date(mc.dateCreated).toLocaleDateString(language)}
+                                                    </div>
+                                                </div>
                                                 {selected ? <span className={`absolute inset-y-0 flex items-center ${language === 'ar' ? 'end-0 pe-3' : 'start-0 ps-3'} text-primary-600`}><CheckCircleIcon className="h-5 w-5"/></span> : null}
                                             </>
                                         )}
@@ -586,11 +594,13 @@ const InventoryIssueRequestsPage: React.FC = () => {
             <div className="mt-3 p-3 border rounded-md bg-gray-50 dark:bg-secondary-700 dark:border-secondary-600">
                 <h4 className="text-md font-semibold mb-1 text-gray-700 dark:text-gray-200">{getLabel('vehicleInformation')}</h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-1 text-sm">
-                    <p><strong className="dark:text-gray-300">{getLabel('vehicle')}:</strong> {vehiclesMap[selectedMaintenanceCardForCombobox.vehicleId]?.make} {vehiclesMap[selectedMaintenanceCardForCombobox.vehicleId]?.model}</p>
-                    <p><strong className="dark:text-gray-300">{getLabel('color')}:</strong> {vehiclesMap[selectedMaintenanceCardForCombobox.vehicleId]?.color || '-'}</p>
-                    <p><strong className="dark:text-gray-300">{getLabel('year')}:</strong> {vehiclesMap[selectedMaintenanceCardForCombobox.vehicleId]?.year || '-'}</p>
-                    <p><strong className="dark:text-gray-300">{getLabel('customer')}:</strong> {customersMap[selectedMaintenanceCardForCombobox.customerId]?.name || '-'}</p>
-                    <p><strong className="dark:text-gray-300">{getLabel('odometerIn')}:</strong> {selectedMaintenanceCardForCombobox.odometerIn || '-'}</p>
+                    <p><strong className="text-gray-700 dark:text-gray-300">{getLabel('vehicle')}:</strong> <span className="text-gray-900 dark:text-white">{vehiclesMap[selectedMaintenanceCardForCombobox.vehicleId]?.make} {vehiclesMap[selectedMaintenanceCardForCombobox.vehicleId]?.model}</span></p>
+                    <p><strong className="text-gray-700 dark:text-gray-300">{getLabel('licensePlate')}:</strong> <span className="text-gray-900 dark:text-white">{vehiclesMap[selectedMaintenanceCardForCombobox.vehicleId]?.licensePlate || '-'}</span></p>
+                    <p><strong className="text-gray-700 dark:text-gray-300">{getLabel('vin')}:</strong> <span className="text-gray-900 dark:text-white">{vehiclesMap[selectedMaintenanceCardForCombobox.vehicleId]?.vin || '-'}</span></p>
+                    <p><strong className="text-gray-700 dark:text-gray-300">{getLabel('color')}:</strong> <span className="text-gray-900 dark:text-white">{vehiclesMap[selectedMaintenanceCardForCombobox.vehicleId]?.color || '-'}</span></p>
+                    <p><strong className="text-gray-700 dark:text-gray-300">{getLabel('year')}:</strong> <span className="text-gray-900 dark:text-white">{vehiclesMap[selectedMaintenanceCardForCombobox.vehicleId]?.year || '-'}</span></p>
+                    <p><strong className="text-gray-700 dark:text-gray-300">{getLabel('customer')}:</strong> <span className="text-gray-900 dark:text-white">{customersMap[selectedMaintenanceCardForCombobox.customerId]?.name || '-'}</span></p>
+                    <p><strong className="text-gray-700 dark:text-gray-300">{getLabel('odometerIn')}:</strong> <span className="text-gray-900 dark:text-white">{selectedMaintenanceCardForCombobox.odometerIn || '-'}</span></p>
                 </div>
             </div>
           )}
@@ -621,8 +631,8 @@ const InventoryIssueRequestsPage: React.FC = () => {
                             }}
                             placeholder={getLabel('searchOrSelectEmployee')}
                         />
-                        <Combobox.Button className="absolute inset-y-0 end-0 flex items-center pe-2 rtl:ps-2 rtl:inset-y-0 rtl:start-0">
-                            <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                        <Combobox.Button className="absolute inset-y-0 end-0 flex items-center pe-3 rtl:ps-3 rtl:inset-y-0 rtl:start-0 rtl:end-auto">
+                            <ChevronUpDownIcon className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" aria-hidden="true" />
                         </Combobox.Button>
                     </div>
                     <Transition as={Fragment} leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0" 
@@ -634,7 +644,7 @@ const InventoryIssueRequestsPage: React.FC = () => {
                             }
                         }}
                     >
-                        <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-secondary-700 py-1 text-base shadow-lg ring-1 ring-black/5 dark:ring-white/10 focus:outline-none sm:text-sm z-20">
+                        <Combobox.Options className="absolute mt-1 max-h-60 w-72 sm:w-80 overflow-auto scrollbar-thin rounded-md bg-white dark:bg-secondary-700 py-1 text-base shadow-lg ring-1 ring-black/5 dark:ring-white/10 focus:outline-none sm:text-sm z-50 left-0 right-auto">
                             {filteredEmployeesForReceiverCombobox.length === 0 && receiverQuery.trim() !== '' ? (
                                  <div className="relative cursor-default select-none px-4 py-2 text-gray-700 dark:text-gray-300">
                                      {getLabel('noDataFound')} "{receiverQuery}". {getLabel('typeToAddNew')}
@@ -674,16 +684,16 @@ const InventoryIssueRequestsPage: React.FC = () => {
               const displayInfo = partInfo ? `${partInfo.name} (${partInfo.sku})` : getLabel('unknownPart');
               return (
                 <div key={item.id || index} className="grid grid-cols-12 gap-2 items-center mb-2 p-2 border-b dark:border-gray-700">
-                    <div className="col-span-5"><label className="text-xs">{getLabel('part')}</label><input type="text" value={displayInfo} readOnly className={`${commonInputStyle} bg-gray-100 dark:bg-secondary-600`} /></div>
-                    <div className="col-span-2"><label className="text-xs">{getLabel('quantityRequested')}</label><input type="number" value={item.quantityRequested} onChange={e => handleRequestItemChange(index, 'quantityRequested', e.target.value)} className={commonInputStyle} /></div>
-                    <div className="col-span-3"><label className="text-xs">{getLabel('notes')}</label><input type="text" name={`itemNotes-${index}`} value={item.notes || ''} onChange={e => handleRequestItemChange(index, 'notes', e.target.value)} className={commonInputStyle} /></div>
+                    <div className="col-span-5"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('part')}</label><input type="text" value={displayInfo} readOnly className={`${commonInputStyle} bg-gray-100 dark:bg-secondary-600 text-gray-900 dark:text-white`} /></div>
+                    <div className="col-span-2"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('quantityRequested')}</label><input type="number" value={item.quantityRequested} onChange={e => handleRequestItemChange(index, 'quantityRequested', e.target.value)} className={commonInputStyle} /></div>
+                    <div className="col-span-3"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('notes')}</label><input type="text" name={`itemNotes-${index}`} value={item.notes || ''} onChange={e => handleRequestItemChange(index, 'notes', e.target.value)} className={commonInputStyle} /></div>
                     <div className="col-span-1 flex items-end"><Button type="button" variant="outline" size="sm" onClick={() => openPartDetailModal(item.partId)} title={getLabel('partDetails')}><EyeIcon className="h-4 w-4" /></Button></div>
                     <div className="col-span-1 flex items-end"><Button type="button" variant="danger" size="sm" onClick={() => removeRequestItem(item.id)}><TrashIcon className="h-4 w-4" /></Button></div>
                 </div>
               );
             })}
             <div className="grid grid-cols-12 gap-2 items-end mt-2">
-                <div className="col-span-6"><label className="text-xs">{getLabel('part')}</label>
+                <div className="col-span-6"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('part')}</label>
                     <Combobox value={selectedPartForCombobox} onChange={setSelectedPartForCombobox}>
                         <div className="relative mt-1">
                             <Combobox.Input
@@ -692,22 +702,40 @@ const InventoryIssueRequestsPage: React.FC = () => {
                                 onChange={(event) => setPartInputQuery(event.target.value)}
                                 placeholder={getLabel('searchOrSelectPart')}
                             />
-                            <Combobox.Button className="absolute inset-y-0 end-0 flex items-center pe-2 rtl:ps-2 rtl:inset-y-0 rtl:start-0">
-                                <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                            <Combobox.Button className="absolute inset-y-0 end-0 flex items-center pe-3 rtl:ps-3 rtl:inset-y-0 rtl:start-0 rtl:end-auto">
+                                <ChevronUpDownIcon className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" aria-hidden="true" />
                             </Combobox.Button>
                         </div>
                         <Transition as={Fragment} leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0" afterLeave={() => setPartInputQuery('')}>
-                            <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-secondary-700 py-1 text-base shadow-lg ring-1 ring-black/5 dark:ring-white/10 focus:outline-none sm:text-sm z-20">
+                            <Combobox.Options className="absolute mt-1 max-h-60 w-96 sm:w-[28rem] overflow-auto scrollbar-thin rounded-md bg-white dark:bg-secondary-700 py-1 text-base shadow-lg ring-1 ring-black/5 dark:ring-white/10 focus:outline-none sm:text-sm z-50 left-0 right-auto">
                                 {availablePartsForCombobox.length === 0 && partInputQuery !== '' ? (
                                      <div className="relative cursor-default select-none px-4 py-2 text-gray-700 dark:text-gray-300">{getLabel('noDataFound')}</div>
                                 ) : (
                                     availablePartsForCombobox.map((p) => (
-                                        <Combobox.Option key={p.displayId} value={p} className={({ active }) => `relative cursor-default select-none py-2 ps-10 pe-4 ${language === 'ar' ? 'text-right ps-4 pe-10' : 'text-left ps-10 pe-4'} ${active ? 'bg-primary-600 text-white' : 'text-gray-900 dark:text-white'}`}>
+                                        <Combobox.Option key={p.displayId} value={p} className={({ active }) => `relative cursor-default select-none py-3 ps-10 pe-4 ${language === 'ar' ? 'text-right ps-4 pe-10' : 'text-left ps-10 pe-4'} ${active ? 'bg-primary-600 text-white' : 'text-gray-900 dark:text-white'}`}>
                                             {({selected}) => (
                                                 <>
-                                                    <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
-                                                        {p.name} {p.sku ? `(${p.sku})` : ''} {p.compatibleVehicles ? `- ${p.compatibleVehicles.substring(0,20)}...` : ''} - ${getLabel(p.warehouse === 'main' ? 'mainWarehouse' : 'secondaryWarehouse')} - {p.condition ? `${getLabel('condition')}: ${getLabel(p.condition.toString())}` : ''} - ${getLabel('available')}: {p.availableQuantity}
-                                                    </span>
+                                                    <div className={`block ${selected ? 'font-medium' : 'font-normal'}`}>
+                                                        <div className="flex items-center justify-between">
+                                                            <span className="font-medium text-gray-900 dark:text-white truncate flex-1">{p.name}</span>
+                                                            <span className="text-sm text-primary-600 dark:text-primary-400 ml-2 flex-shrink-0">
+                                                                {getLabel('available')}: {p.availableQuantity}
+                                                            </span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2 mt-1">
+                                                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${p.condition === 'New' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'}`}>
+                                                                {p.condition ? (language === 'ar' ? (p.condition === 'New' ? 'جديدة' : 'مستعملة') : (p.condition === 'New' ? 'New' : 'Used')) : ''}
+                                                            </span>
+                                                            {p.sku && <span className="text-xs text-gray-500 dark:text-gray-400 truncate">SKU: {p.sku}</span>}
+                                                        </div>
+                                                        {p.compatibleVehicles && (
+                                                            <div className="mt-1">
+                                                                <span className="text-xs text-gray-600 dark:text-gray-300 block truncate">
+                                                                    {language === 'ar' ? 'متوافق مع: ' : 'Compatible: '}{p.compatibleVehicles.length > 40 ? p.compatibleVehicles.substring(0, 40) + '...' : p.compatibleVehicles}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                     {selected ? <span className={`absolute inset-y-0 flex items-center ${language === 'ar' ? 'end-0 pe-3' : 'start-0 ps-3'} text-primary-600`}><CheckCircleIcon className="h-5 w-5"/></span> : null}
                                                 </>
                                             )}
@@ -718,7 +746,7 @@ const InventoryIssueRequestsPage: React.FC = () => {
                         </Transition>
                     </Combobox>
                 </div>
-                <div className="col-span-3"><label className="text-xs">{getLabel('quantity')}</label><input type="number" value={newRequestItemQuantity} onChange={e => setNewRequestItemQuantity(parseInt(e.target.value) || 1)} min="1" className={commonInputStyle} /></div>
+                <div className="col-span-3"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('quantity')}</label><input type="number" value={newRequestItemQuantity} onChange={e => setNewRequestItemQuantity(parseInt(e.target.value) || 1)} min="1" className={commonInputStyle} /></div>
                 <div className="col-span-3"><Button type="button" variant="secondary" onClick={addRequestItem} leftIcon={PlusIcon}>{getLabel('addPartToRequest')}</Button></div>
             </div>
           </fieldset>
@@ -757,8 +785,17 @@ const InventoryIssueRequestsPage: React.FC = () => {
                         <h4 className="text-md font-semibold mt-3 mb-2 text-gray-800 dark:text-gray-100 border-b pb-1 dark:border-gray-600">{getLabel('linkedMaintenanceCard')}</h4>
                         <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1">
                             <DetailItem labelKey="maintenanceCard" value={maintenanceCardsMap[viewingRequest.maintenanceCardId].internalId} />
-                            <DetailItem labelKey="vehicle" value={`${vehiclesMap[maintenanceCardsMap[viewingRequest.maintenanceCardId].vehicleId]?.make} ${vehiclesMap[maintenanceCardsMap[viewingRequest.maintenanceCardId].vehicleId]?.model} (${vehiclesMap[maintenanceCardsMap[viewingRequest.maintenanceCardId].vehicleId]?.licensePlate})`} />
                             <DetailItem labelKey="customer" value={customersMap[maintenanceCardsMap[viewingRequest.maintenanceCardId].customerId]?.name} />
+                        </dl>
+
+                        <h4 className="text-md font-semibold mt-4 mb-2 text-gray-800 dark:text-gray-100 border-b pb-1 dark:border-gray-600">{getLabel('vehicleInformation')}</h4>
+                        <dl className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-1">
+                            <DetailItem labelKey="vehicle" value={`${vehiclesMap[maintenanceCardsMap[viewingRequest.maintenanceCardId].vehicleId]?.make} ${vehiclesMap[maintenanceCardsMap[viewingRequest.maintenanceCardId].vehicleId]?.model}`} />
+                            <DetailItem labelKey="licensePlate" value={vehiclesMap[maintenanceCardsMap[viewingRequest.maintenanceCardId].vehicleId]?.licensePlate} />
+                            <DetailItem labelKey="vin" value={vehiclesMap[maintenanceCardsMap[viewingRequest.maintenanceCardId].vehicleId]?.vin} />
+                            <DetailItem labelKey="color" value={vehiclesMap[maintenanceCardsMap[viewingRequest.maintenanceCardId].vehicleId]?.color} />
+                            <DetailItem labelKey="year" value={vehiclesMap[maintenanceCardsMap[viewingRequest.maintenanceCardId].vehicleId]?.year} />
+                            <DetailItem labelKey="odometerIn" value={maintenanceCardsMap[viewingRequest.maintenanceCardId].odometerIn} />
                         </dl>
                     </div>
                 )}
@@ -780,10 +817,22 @@ const InventoryIssueRequestsPage: React.FC = () => {
                                         const partInfo = item.sourceWarehouse === 'main' ? partsMap[item.partId] : partsMap[secondaryWarehouseStock.find(sws => sws.id === item.sourceItemId)?.partId || ''];
                                         return (
                                         <tr key={item.id}>
-                                            <td className="px-3 py-2 whitespace-nowrap">{partInfo?.name || getLabel('unknownPart')} ({partInfo?.sku || 'N/A'})</td>
-                                            <td className="px-3 py-2 text-center whitespace-nowrap">{item.quantityRequested}</td>
-                                            <td className="px-3 py-2 text-center whitespace-nowrap">{item.quantityIssued || 0}</td>
-                                            <td className="px-3 py-2">{item.notes || '-'}</td>
+                                            <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">
+                                                {partInfo?.name || getLabel('unknownPart')} ({partInfo?.sku || 'N/A'})
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => openPartDetailModal(item.partId)}
+                                                    className="ms-2"
+                                                    title={getLabel('partDetails')}
+                                                >
+                                                    <EyeIcon className="h-3 w-3" />
+                                                </Button>
+                                            </td>
+                                            <td className="px-3 py-2 text-center whitespace-nowrap text-gray-900 dark:text-white">{item.quantityRequested}</td>
+                                            <td className="px-3 py-2 text-center whitespace-nowrap text-gray-900 dark:text-white">{item.quantityIssued || 0}</td>
+                                            <td className="px-3 py-2 text-gray-900 dark:text-white">{item.notes || '-'}</td>
                                         </tr>
                                         );
                                     })}
@@ -808,10 +857,10 @@ const InventoryIssueRequestsPage: React.FC = () => {
                                  <tbody className="bg-white dark:bg-secondary-800 divide-y divide-gray-200 dark:divide-secondary-700">
                                     {viewingRequest.replacedParts.map(rp => (
                                         <tr key={rp.id}>
-                                            <td className="px-3 py-2 whitespace-nowrap">{rp.customPartName || (rp.partId && partsMap[rp.partId]?.name) || getLabel('unknownPart')}</td>
-                                            <td className="px-3 py-2 text-center whitespace-nowrap">{rp.quantity}</td>
-                                            <td className="px-3 py-2 whitespace-nowrap">{getLabel(rp.condition)}</td>
-                                            <td className="px-3 py-2">{rp.notes || '-'}</td>
+                                            <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{rp.customPartName || (rp.partId && partsMap[rp.partId]?.name) || getLabel('unknownPart')}</td>
+                                            <td className="px-3 py-2 text-center whitespace-nowrap text-gray-900 dark:text-white">{rp.quantity}</td>
+                                            <td className="px-3 py-2 whitespace-nowrap text-gray-900 dark:text-white">{getLabel(rp.condition)}</td>
+                                            <td className="px-3 py-2 text-gray-900 dark:text-white">{rp.notes || '-'}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -828,20 +877,68 @@ const InventoryIssueRequestsPage: React.FC = () => {
        {/* Part Detail Modal */}
         <Modal isOpen={isPartDetailModalOpen} onClose={() => setIsPartDetailModalOpen(false)} title={getLabel('partDetails')} size="lg">
             {partToView && (
-                <div className="space-y-2 text-sm">
-                    <p><strong>{getLabel('name')}:</strong> {partToView.name}</p>
-                    <p><strong>{getLabel('sku')}:</strong> {partToView.sku}</p>
-                    <p><strong>{getLabel('internalId')}:</strong> {partToView.internalId}</p>
-                    <p><strong>{getLabel('partCondition')}:</strong> {partToView.condition ? getLabel(partToView.condition) : '-'}</p>
-                    <p><strong>{getLabel('quantityInStock')}:</strong> {partToView.quantityInStock}</p>
-                    <p><strong>{getLabel('purchasePrice')}:</strong> {partToView.purchasePrice.toFixed(2)}</p>
-                    <p><strong>{getLabel('sellingPrice')}:</strong> {partToView.sellingPrice.toFixed(2)}</p>
-                    <p><strong>{getLabel('initialStock')}:</strong> {partToView.initialStock || 0}</p>
-                    <p><strong>{getLabel('compatibleVehicles')}:</strong> {partToView.compatibleVehicles || '-'}</p>
-                    <p><strong>{getLabel('supplier')}:</strong> {partToView.supplierId ? (MOCK_SUPPLIERS.find(s=>s.id === partToView.supplierId)?.name) : '-'}</p>
-                    <p><strong>{getLabel('description')}:</strong> {partToView.description || '-'}</p>
-                    <div className="pt-4 flex justify-end">
-                        <Button variant="secondary" onClick={() => setIsPartDetailModalOpen(false)}>{getLabel('cancel')}</Button>
+                <div className="space-y-4">
+                    {/* Header with part name and SKU */}
+                    <div className="bg-gray-50 dark:bg-secondary-700 p-4 rounded-lg">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{partToView.name}</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{getLabel('sku')}: {partToView.sku}</p>
+                    </div>
+
+                    {/* Basic Information */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-3">
+                            <h4 className="font-medium text-gray-900 dark:text-white border-b pb-1">{getLabel('basicInformation')}</h4>
+                            <div className="space-y-2 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600 dark:text-gray-400">{getLabel('internalId')}:</span>
+                                    <span className="font-medium text-gray-900 dark:text-white">{partToView.internalId}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600 dark:text-gray-400">{getLabel('partCondition')}:</span>
+                                    <span className={`font-medium px-2 py-1 rounded-full text-xs ${partToView.condition === 'New' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'}`}>
+                                        {partToView.condition ? (language === 'ar' ? (partToView.condition === 'New' ? 'جديدة' : 'مستعملة') : partToView.condition) : '-'}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600 dark:text-gray-400">{getLabel('quantityInStock')}:</span>
+                                    <span className="font-medium text-gray-900 dark:text-white">{partToView.quantityInStock}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Pricing Information */}
+                        <div className="space-y-3">
+                            <h4 className="font-medium text-gray-900 dark:text-white border-b pb-1">{getLabel('pricing')}</h4>
+                            <div className="space-y-2 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600 dark:text-gray-400">{getLabel('purchasePrice')}:</span>
+                                    <span className="font-medium text-gray-900 dark:text-white">{partToView.purchasePrice.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-gray-600 dark:text-gray-400">{getLabel('sellingPrice')}:</span>
+                                    <span className="font-medium text-gray-900 dark:text-white">{partToView.sellingPrice.toFixed(2)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Additional Information */}
+                    <div className="space-y-3">
+                        <h4 className="font-medium text-gray-900 dark:text-white border-b pb-1">{getLabel('additionalInformation')}</h4>
+                        <div className="space-y-2 text-sm">
+                            <div>
+                                <span className="text-gray-600 dark:text-gray-400">{getLabel('compatibleVehicles')}:</span>
+                                <p className="mt-1 text-gray-900 dark:text-white">{partToView.compatibleVehicles || '-'}</p>
+                            </div>
+                            <div>
+                                <span className="text-gray-600 dark:text-gray-400">{getLabel('description')}:</span>
+                                <p className="mt-1 text-gray-900 dark:text-white">{partToView.description || '-'}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="pt-4 flex justify-end border-t dark:border-gray-600">
+                        <Button variant="secondary" onClick={() => setIsPartDetailModalOpen(false)}>{getLabel('close')}</Button>
                     </div>
                 </div>
             )}
@@ -851,14 +948,14 @@ const InventoryIssueRequestsPage: React.FC = () => {
       {/* Reconcile Modal */}
       {requestToReconcile && (
          <Modal isOpen={isReconcileModalOpen} onClose={closeReconcileModal} title={`${getLabel('reconcileIssueRequest')} ${requestToReconcile.internalId}`} size="3xl">
-             <form onSubmit={handleReconcileSubmit} className="space-y-4 max-h-[75vh] overflow-y-auto p-1">
+             <form onSubmit={handleReconcileSubmit} className="space-y-4 max-h-[75vh] overflow-y-auto custom-scroll p-1">
                  <h3 className="text-lg font-medium mb-2 dark:text-white">{getLabel('issuedParts')}:</h3>
                  {requestToReconcile.items.map(item => {
                     const partInfo = item.sourceWarehouse === 'main' ? partsMap[item.partId] : partsMap[secondaryWarehouseStock.find(sws => sws.id === item.sourceItemId)?.partId || ''];
                     return(
                      <div key={item.id} className="p-2 border rounded-md dark:border-gray-600">
-                         <p><strong>{partInfo?.name || getLabel('unknownPart')}</strong> ({getLabel('sku')}: {partInfo?.sku || '-'})</p>
-                         <p>{getLabel('quantityIssued')}: {item.quantityIssued || 0}</p>
+                         <p className="text-gray-900 dark:text-white"><strong>{partInfo?.name || getLabel('unknownPart')}</strong> ({getLabel('sku')}: {partInfo?.sku || '-'})</p>
+                         <p className="text-gray-700 dark:text-gray-300">{getLabel('quantityIssued')}: {item.quantityIssued || 0}</p>
                      </div>
                     );
                  })}
@@ -866,7 +963,7 @@ const InventoryIssueRequestsPage: React.FC = () => {
                  <h3 className="text-lg font-medium mb-2 dark:text-white">{getLabel('replacedPartsInfo')}:</h3>
                  {currentReplacedParts.map((rp, index) => (
                      <div key={rp.id || index} className="grid grid-cols-12 gap-2 items-center mb-2 p-2 border rounded-md dark:border-gray-700">
-                        <div className="col-span-3"><label className="text-xs">{getLabel('originalPart')}</label>
+                        <div className="col-span-3"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('originalPart')}</label>
                             <select 
                                 value={rp.inventoryIssueRequestItemId || ''} 
                                 onChange={e => handleReplacedPartInfoChange(index, 'inventoryIssueRequestItemId', e.target.value)} 
@@ -880,7 +977,7 @@ const InventoryIssueRequestsPage: React.FC = () => {
                                 })}
                             </select>
                         </div>
-                        <div className="col-span-3"><label className="text-xs">{getLabel('customPartName')}</label>
+                        <div className="col-span-3"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('customPartName')}</label>
                             <input 
                                 type="text" 
                                 value={rp.customPartName || ''} 
@@ -890,18 +987,18 @@ const InventoryIssueRequestsPage: React.FC = () => {
                                 disabled={!!rp.inventoryIssueRequestItemId}
                             />
                         </div>
-                        <div className="col-span-2"><label className="text-xs">{getLabel('quantity')}</label><input type="number" value={rp.quantity} min="1" onChange={e => handleReplacedPartInfoChange(index, 'quantity', e.target.value)} className={commonInputStyle} /></div>
-                        <div className="col-span-3"><label className="text-xs">{getLabel('condition')}</label>
+                        <div className="col-span-2"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('quantity')}</label><input type="number" value={rp.quantity} min="1" onChange={e => handleReplacedPartInfoChange(index, 'quantity', e.target.value)} className={commonInputStyle} /></div>
+                        <div className="col-span-3"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('condition')}</label>
                             <select value={rp.condition} onChange={e => handleReplacedPartInfoChange(index, 'condition', e.target.value)} className={commonInputStyle}>
                                 {Object.values(ReplacedPartCondition).map(cond => <option key={cond} value={cond}>{getLabel(cond)}</option>)}
                             </select>
                         </div>
-                        <div className="col-span-11"><label className="text-xs">{getLabel('notes')}</label><input type="text" value={rp.notes || ''} onChange={e => handleReplacedPartInfoChange(index, 'notes', e.target.value)} className={commonInputStyle} /></div>
+                        <div className="col-span-11"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('notes')}</label><input type="text" value={rp.notes || ''} onChange={e => handleReplacedPartInfoChange(index, 'notes', e.target.value)} className={commonInputStyle} /></div>
                         <div className="col-span-1 flex items-end"><Button type="button" variant="danger" size="sm" onClick={() => removeReplacedPartUi(rp.id)}><TrashIcon className="h-4 w-4"/></Button></div>
                      </div>
                  ))}
                  <div className="grid grid-cols-12 gap-2 items-end mt-3 p-2 border-t dark:border-gray-600 pt-3">
-                    <div className="col-span-3"><label className="text-xs">{getLabel('originalPart')}</label>
+                    <div className="col-span-3"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('originalPart')}</label>
                         <select 
                             value={newReplacedPartInfo.inventoryIssueRequestItemId || ''} 
                             onChange={e => {
@@ -919,7 +1016,7 @@ const InventoryIssueRequestsPage: React.FC = () => {
                             })}
                         </select>
                     </div>
-                    <div className="col-span-3"><label className="text-xs">{getLabel('customPartName')}</label>
+                    <div className="col-span-3"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('customPartName')}</label>
                         <input 
                             type="text" 
                             value={newReplacedPartInfo.customPartName || ''} 
@@ -929,13 +1026,13 @@ const InventoryIssueRequestsPage: React.FC = () => {
                             disabled={!!newReplacedPartInfo.inventoryIssueRequestItemId}
                         />
                     </div>
-                    <div className="col-span-1"><label className="text-xs">{getLabel('quantity')}</label><input type="number" value={newReplacedPartInfo.quantity} min="1" onChange={e => setNewReplacedPartInfo(prev => ({...prev, quantity: parseInt(e.target.value) || 1}))} className={commonInputStyle} /></div>
-                    <div className="col-span-2"><label className="text-xs">{getLabel('condition')}</label>
+                    <div className="col-span-1"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('quantity')}</label><input type="number" value={newReplacedPartInfo.quantity} min="1" onChange={e => setNewReplacedPartInfo(prev => ({...prev, quantity: parseInt(e.target.value) || 1}))} className={commonInputStyle} /></div>
+                    <div className="col-span-2"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('condition')}</label>
                         <select value={newReplacedPartInfo.condition} onChange={e => setNewReplacedPartInfo(prev => ({...prev, condition: e.target.value as ReplacedPartCondition}))} className={commonInputStyle}>
                              {Object.values(ReplacedPartCondition).map(cond => <option key={cond} value={cond}>{getLabel(cond)}</option>)}
                         </select>
                     </div>
-                     <div className="col-span-2"><label className="text-xs">{getLabel('notes')}</label><input type="text" value={newReplacedPartInfo.notes || ''} onChange={e => setNewReplacedPartInfo(prev => ({...prev, notes: e.target.value}))} className={commonInputStyle} /></div>
+                     <div className="col-span-2"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('notes')}</label><input type="text" value={newReplacedPartInfo.notes || ''} onChange={e => setNewReplacedPartInfo(prev => ({...prev, notes: e.target.value}))} className={commonInputStyle} /></div>
                     <div className="col-span-1 flex items-end"><Button type="button" variant="secondary" onClick={addReplacedPartUi} leftIcon={PlusIcon}></Button></div>
                  </div>
                  <div className="pt-4 flex justify-end space-x-3 rtl:space-x-reverse border-t dark:border-secondary-600 mt-4">
