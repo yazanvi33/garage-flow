@@ -11,7 +11,7 @@ import PartsPage from './pages/PartsPage';
 import EmployeesPage from './pages/EmployeesPage';
 import ReportsPage from './pages/ReportsPage';
 import OutgoingInvoicesPage from './pages/OutgoingInvoicesPage';
-import IncomingInvoicesPage from './pages/IncomingInvoicesPage';
+import PurchaseInvoicesPage from './pages/PurchaseInvoicesPage';
 import ReturnInvoicesPage from './pages/ReturnInvoicesPage';
 import ExternalTechniciansPage from './pages/ExternalTechniciansPage';
 import WorkshopEquipmentPage from './pages/WorkshopEquipmentPage';
@@ -146,7 +146,7 @@ const App: React.FC = () => {
 
             {/* Invoicing & Expenses Routes */}
             <Route path="invoices/outgoing" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.ACCOUNTANT]}><OutgoingInvoicesPage /></ProtectedRoute>} />
-            <Route path="invoices/incoming" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.ACCOUNTANT]}><IncomingInvoicesPage /></ProtectedRoute>} />
+            <Route path="invoices/incoming" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.ACCOUNTANT]}><PurchaseInvoicesPage /></ProtectedRoute>} />
             <Route path="invoices/returns" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.ACCOUNTANT]}><ReturnInvoicesPage /></ProtectedRoute>} />
             <Route path="invoices/external-technicians" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.ACCOUNTANT]}><ExternalTechniciansPage /></ProtectedRoute>} />
             <Route path="invoices/equipment" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.ACCOUNTANT]}><WorkshopEquipmentPage /></ProtectedRoute>} />

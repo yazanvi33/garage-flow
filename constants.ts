@@ -49,7 +49,7 @@ export const NAVIGATION_ITEMS: NavItem[] = [
     roles: [UserRole.ADMIN, UserRole.ACCOUNTANT],
     children: [
         { id: 'outgoing', label_en: 'Outgoing Invoices', label_ar: 'فواتير صادرة', path: '/invoices/outgoing', icon: DocumentTextIcon },
-        { id: 'incoming', label_en: 'Incoming Invoices', label_ar: 'فواتير واردة', path: '/invoices/incoming', icon: DocumentTextIcon },
+        { id: 'incoming', label_en: 'Purchase Invoices', label_ar: 'الفواتير الواردة', path: '/invoices/incoming', icon: DocumentTextIcon },
         { id: 'returns', label_en: 'Return Invoices', label_ar: 'فواتير مرتجعة', path: '/invoices/returns', icon: DocumentTextIcon },
         { id: 'external_tech_invoices', label_en: 'External Technicians', label_ar: 'فواتير فنيين خارجيين', path: '/invoices/external-technicians', icon: UsersIcon }, // Moved
         { id: 'equipment', label_en: 'Workshop Equipment', label_ar: 'معدات الورشة', path: '/invoices/equipment', icon: CogIcon }, // Path might change if it becomes a type of expense invoice
@@ -420,6 +420,72 @@ export const MOCK_SECONDARY_WAREHOUSE_ITEMS: SecondaryWarehouseItem[] = [
     },
 ];
 
+export const MOCK_PURCHASE_INVOICES: PurchaseInvoice[] = [
+  {
+    id: 'pi-001',
+    internalId: 'PI-0001',
+    invoiceNumber: 'SUP-2024-001',
+    invoiceDate: '2024-01-15',
+    supplierId: 'supp-001',
+    subtotal: 1000,
+    discount: 50,
+    totalAfterDiscount: 950,
+    amountPaid: 500,
+    items: [
+      {
+        id: 'pii-001',
+        partId: 'part-001',
+        quantity: 20,
+        unitPrice: 15,
+        totalPrice: 300,
+        notes: 'فلاتر زيت تويوتا - دفعة جديدة'
+      },
+      {
+        id: 'pii-002',
+        partId: 'part-002',
+        quantity: 10,
+        unitPrice: 70,
+        totalPrice: 700,
+        notes: 'تيل فرامل أمامي فورد'
+      }
+    ],
+    notes: 'فاتورة شراء قطع غيار - دفعة يناير',
+    createdAt: '2024-01-15T09:00:00Z',
+    createdBy: 'emp-001'
+  },
+  {
+    id: 'pi-002',
+    internalId: 'PI-0002',
+    invoiceNumber: 'SUP-2024-002',
+    invoiceDate: '2024-02-01',
+    supplierId: 'supp-002',
+    subtotal: 800,
+    discount: 0,
+    totalAfterDiscount: 800,
+    amountPaid: 800,
+    items: [
+      {
+        id: 'pii-003',
+        partId: 'part-003',
+        quantity: 15,
+        unitPrice: 25,
+        totalPrice: 375,
+        notes: 'شمعات إشعال هيونداي'
+      },
+      {
+        id: 'pii-004',
+        partId: 'part-004',
+        quantity: 5,
+        unitPrice: 85,
+        totalPrice: 425,
+        notes: 'فلاتر هواء متنوعة'
+      }
+    ],
+    notes: 'فاتورة شراء قطع غيار - دفعة فبراير',
+    createdAt: '2024-02-01T10:30:00Z',
+    createdBy: 'emp-002'
+  }
+];
 
 export const MOCK_WORKSHOP_STATS_PLACEHOLDER: WorkshopStats = {
     carsInWorkshop: 0,
@@ -691,6 +757,26 @@ export const LABELS: Record<string, Record<string, string>> = {
     requestDetails: "Request Details",
     personnel: "Personnel",
     linkedMaintenanceCard: "Linked Maintenance Card",
+    purchaseInvoices: "Purchase Invoices",
+    addNewPurchaseInvoice: "Add New Purchase Invoice",
+    editPurchaseInvoice: "Edit Purchase Invoice",
+    purchaseInvoice: "Purchase Invoice",
+    supplierInvoiceNumber: "Supplier Invoice Number",
+    invoiceDate: "Invoice Date",
+    subtotal: "Subtotal",
+    discount: "Discount",
+    totalAfterDiscount: "Total After Discount",
+    amountPaid: "Amount Paid",
+    unitPrice: "Unit Price",
+    totalPrice: "Total Price",
+    addItemToInvoice: "Add Item to Invoice",
+    removeItem: "Remove Item",
+    invoiceDetails: "Invoice Details",
+    invoiceItems: "Invoice Items",
+    selectSupplier: "Select Supplier",
+    invoiceTotals: "Invoice Totals",
+    createdBy: "Created By",
+    confirmDelete: "Are you sure you want to delete?",
   },
   ar: {
     appName: APP_NAME,
@@ -917,5 +1003,25 @@ export const LABELS: Record<string, Record<string, string>> = {
     requestDetails: "تفاصيل الطلب",
     personnel: "الأشخاص المعنيون",
     linkedMaintenanceCard: "بطاقة الصيانة المرتبطة",
+    purchaseInvoices: "الفواتير الواردة",
+    addNewPurchaseInvoice: "إضافة فاتورة واردة جديدة",
+    editPurchaseInvoice: "تعديل فاتورة واردة",
+    purchaseInvoice: "فاتورة واردة",
+    supplierInvoiceNumber: "رقم فاتورة المورد",
+    invoiceDate: "تاريخ الفاتورة",
+    subtotal: "المجموع الفرعي",
+    discount: "الحسم",
+    totalAfterDiscount: "المجموع بعد الحسم",
+    amountPaid: "المبلغ المدفوع",
+    unitPrice: "السعر الإفرادي",
+    totalPrice: "السعر الإجمالي",
+    addItemToInvoice: "إضافة بند للفاتورة",
+    removeItem: "حذف البند",
+    invoiceDetails: "تفاصيل الفاتورة",
+    invoiceItems: "بنود الفاتورة",
+    selectSupplier: "اختر المورد",
+    invoiceTotals: "إجماليات الفاتورة",
+    createdBy: "أنشئت بواسطة",
+    confirmDelete: "هل أنت متأكد من الحذف؟",
   }
 };

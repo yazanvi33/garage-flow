@@ -8,9 +8,13 @@ if (!rootElement) {
   throw new Error("Could not find root element to mount to");
 }
 
-const root = createRoot(rootElement);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+// تحقق من عدم وجود root مسبقاً
+if (!rootElement.hasAttribute('data-react-root')) {
+  rootElement.setAttribute('data-react-root', 'true');
+  const root = createRoot(rootElement);
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
+}

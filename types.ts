@@ -285,3 +285,29 @@ export interface MappedPartForCombobox {
   warehouse: 'main' | 'secondary';
   originalPartData: SparePart | SecondaryWarehouseItem; // To access full data if needed
 }
+
+// Purchase Invoice (Incoming Invoice) Types
+export interface PurchaseInvoice {
+  id: string;
+  internalId: string; // e.g., PI-0001
+  invoiceNumber: string; // Supplier's invoice number
+  invoiceDate: string;
+  supplierId: string;
+  subtotal: number; // Total before discount
+  discount: number; // Discount amount
+  totalAfterDiscount: number; // Total after discount
+  amountPaid: number; // Amount paid to supplier
+  items: PurchaseInvoiceItem[];
+  notes?: string;
+  createdAt: string;
+  createdBy: string; // Employee ID who created the invoice
+}
+
+export interface PurchaseInvoiceItem {
+  id: string;
+  partId: string; // References SparePart.id
+  quantity: number;
+  unitPrice: number; // Purchase price per unit
+  totalPrice: number; // quantity * unitPrice
+  notes?: string;
+}

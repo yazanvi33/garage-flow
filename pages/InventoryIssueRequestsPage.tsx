@@ -1,5 +1,6 @@
 
 import React, { useContext, useState, useMemo, useEffect, Fragment } from 'react';
+import { createPortal } from 'react-dom';
 import { AppContext } from '../context/AppContext';
 import { 
     MOCK_INVENTORY_ISSUE_REQUESTS, 
@@ -524,6 +525,7 @@ const InventoryIssueRequestsPage: React.FC = () => {
       <input type="text" placeholder={`${getLabel('search')}...`} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={commonInputStyle} />
       <Table columns={columns} data={sortedRequests} keyExtractor={(req) => req.id} sortConfig={sortConfig} onSort={setSortConfig} />
 
+
       {/* Create/Edit Modal */}
       <Modal isOpen={isModalOpen} onClose={closeModal} title={editingRequest ? getLabel('editInventoryIssueRequest') : getLabel('addNewInventoryIssueRequest')} size="4xl">
         <form onSubmit={handleSubmit} className="space-y-4 max-h-[80vh] overflow-y-auto overflow-x-hidden custom-scroll p-1">
@@ -875,74 +877,104 @@ const InventoryIssueRequestsPage: React.FC = () => {
       )}
 
        {/* Part Detail Modal */}
-        <Modal isOpen={isPartDetailModalOpen} onClose={() => setIsPartDetailModalOpen(false)} title={getLabel('partDetails')} size="lg">
-            {partToView && (
-                <div className="space-y-4">
+      {isPartDetailModalOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] overflow-y-auto">
+          <div className="flex min-h-screen items-center justify-center p-4">
+            <div
+              className="fixed inset-0 bg-black bg-opacity-50"
+              onClick={() => setIsPartDetailModalOpen(false)}
+              aria-hidden="true"
+            ></div>
+            <div
+              className="relative bg-white dark:bg-secondary-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto z-10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between p-4 border-b dark:border-gray-600">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{getLabel('partDetails')}</h3>
+                <button
+                  type="button"
+                  onClick={() => setIsPartDetailModalOpen(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-150 p-1 rounded-md hover:bg-gray-100 dark:hover:bg-secondary-700"
+                >
+                  <span className="sr-only">Close</span>
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="p-4">
+                {partToView && (
+                  <div className="space-y-4">
                     {/* Header with part name and SKU */}
                     <div className="bg-gray-50 dark:bg-secondary-700 p-4 rounded-lg">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{partToView.name}</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{getLabel('sku')}: {partToView.sku}</p>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{partToView.name}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{getLabel('sku')}: {partToView.sku}</p>
                     </div>
 
                     {/* Basic Information */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-3">
-                            <h4 className="font-medium text-gray-900 dark:text-white border-b pb-1">{getLabel('basicInformation')}</h4>
-                            <div className="space-y-2 text-sm">
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600 dark:text-gray-400">{getLabel('internalId')}:</span>
-                                    <span className="font-medium text-gray-900 dark:text-white">{partToView.internalId}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600 dark:text-gray-400">{getLabel('partCondition')}:</span>
-                                    <span className={`font-medium px-2 py-1 rounded-full text-xs ${partToView.condition === 'New' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'}`}>
-                                        {partToView.condition ? (language === 'ar' ? (partToView.condition === 'New' ? 'جديدة' : 'مستعملة') : partToView.condition) : '-'}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600 dark:text-gray-400">{getLabel('quantityInStock')}:</span>
-                                    <span className="font-medium text-gray-900 dark:text-white">{partToView.quantityInStock}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Pricing Information */}
-                        <div className="space-y-3">
-                            <h4 className="font-medium text-gray-900 dark:text-white border-b pb-1">{getLabel('pricing')}</h4>
-                            <div className="space-y-2 text-sm">
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600 dark:text-gray-400">{getLabel('purchasePrice')}:</span>
-                                    <span className="font-medium text-gray-900 dark:text-white">{partToView.purchasePrice.toFixed(2)}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span className="text-gray-600 dark:text-gray-400">{getLabel('sellingPrice')}:</span>
-                                    <span className="font-medium text-gray-900 dark:text-white">{partToView.sellingPrice.toFixed(2)}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Additional Information */}
-                    <div className="space-y-3">
-                        <h4 className="font-medium text-gray-900 dark:text-white border-b pb-1">{getLabel('additionalInformation')}</h4>
+                      <div className="space-y-3">
+                        <h4 className="font-medium text-gray-900 dark:text-white border-b pb-1">{getLabel('basicInformation')}</h4>
                         <div className="space-y-2 text-sm">
-                            <div>
-                                <span className="text-gray-600 dark:text-gray-400">{getLabel('compatibleVehicles')}:</span>
-                                <p className="mt-1 text-gray-900 dark:text-white">{partToView.compatibleVehicles || '-'}</p>
-                            </div>
-                            <div>
-                                <span className="text-gray-600 dark:text-gray-400">{getLabel('description')}:</span>
-                                <p className="mt-1 text-gray-900 dark:text-white">{partToView.description || '-'}</p>
-                            </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600 dark:text-gray-400">{getLabel('internalId')}:</span>
+                            <span className="font-medium text-gray-900 dark:text-white">{partToView.internalId}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600 dark:text-gray-400">{getLabel('partCondition')}:</span>
+                            <span className={`font-medium px-2 py-1 rounded-full text-xs ${partToView.condition === 'New' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'}`}>
+                              {partToView.condition ? (language === 'ar' ? (partToView.condition === 'New' ? 'جديدة' : 'مستعملة') : partToView.condition) : '-'}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600 dark:text-gray-400">{getLabel('quantityInStock')}:</span>
+                            <span className="font-medium text-gray-900 dark:text-white">{partToView.quantityInStock}</span>
+                          </div>
                         </div>
+                      </div>
+
+                      {/* Pricing Information */}
+                      <div className="space-y-3">
+                        <h4 className="font-medium text-gray-900 dark:text-white border-b pb-1">{getLabel('pricing')}</h4>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-gray-600 dark:text-gray-400">{getLabel('purchasePrice')}:</span>
+                            <span className="font-medium text-gray-900 dark:text-white">{partToView.purchasePrice.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600 dark:text-gray-400">{getLabel('sellingPrice')}:</span>
+                            <span className="font-medium text-gray-900 dark:text-white">{partToView.sellingPrice.toFixed(2)}</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="pt-4 flex justify-end border-t dark:border-gray-600">
-                        <Button variant="secondary" onClick={() => setIsPartDetailModalOpen(false)}>{getLabel('close')}</Button>
+                    {/* Compatible Vehicles and Additional Information */}
+                    <div className="space-y-3">
+                      <h4 className="font-medium text-gray-900 dark:text-white border-b pb-1">{getLabel('additionalInformation')}</h4>
+                      <div className="space-y-2 text-sm">
+                        <div>
+                          <span className="text-gray-600 dark:text-gray-400">{getLabel('compatibleVehicles')}:</span>
+                          <p className="mt-1 text-gray-900 dark:text-white bg-gray-50 dark:bg-secondary-700 p-2 rounded">{partToView.compatibleVehicles || '-'}</p>
+                        </div>
+                        <div>
+                          <span className="text-gray-600 dark:text-gray-400">{getLabel('description')}:</span>
+                          <p className="mt-1 text-gray-900 dark:text-white">{partToView.description || '-'}</p>
+                        </div>
+                      </div>
                     </div>
-                </div>
-            )}
-        </Modal>
+
+                    <div className="pt-4 flex justify-end border-t dark:border-gray-600 mt-4">
+                      <Button type="button" variant="secondary" onClick={() => setIsPartDetailModalOpen(false)}>{getLabel('close')}</Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
 
 
       {/* Reconcile Modal */}
