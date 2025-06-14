@@ -159,9 +159,10 @@ export interface Invoice {
   invoiceNumber: string;
   type: InvoiceType;
   customerId?: string; 
-  supplierId?: string; 
-  maintenanceCardId?: string; 
+  supplierId?: string;
+  maintenanceCardId?: string;
   externalTechnicianInvoiceId?: string; // If this IS an external tech invoice, it's its own ID. If customer invoice INCLUDES one, this links to it.
+  externalTechnicianName?: string; // New field for external technician's name
   dateIssued: string;
   dueDate?: string;
   items: InvoiceItem[];

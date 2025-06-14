@@ -19,8 +19,23 @@ import Modal from '../components/Modal';
 import { PlusIcon, PencilIcon, TrashIcon, EyeIcon, CheckCircleIcon, ArrowPathIcon, ChevronUpDownIcon } from '@heroicons/react/24/outline';
 import { Combobox, Transition } from '@headlessui/react';
 
-const commonInputStyle = "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm dark:bg-secondary-700 dark:border-secondary-600 dark:text-white";
-const comboboxInputStyle = "w-full py-2 ps-3 pe-10 text-sm leading-5 text-gray-900 dark:text-white border border-gray-300 dark:border-secondary-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-secondary-700";
+const getCommonInputStyle = (language: string) => {
+  const baseStyle = "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm dark:bg-secondary-700 dark:border-secondary-600 dark:text-white";
+  const rtlStyle = language === 'ar' ? 'text-right' : 'text-left';
+  return `${baseStyle} ${rtlStyle}`;
+};
+
+const getLabelStyle = (language: string) => {
+  const baseStyle = "block text-sm font-medium text-gray-700 dark:text-gray-300";
+  const rtlStyle = language === 'ar' ? 'text-right' : 'text-left';
+  return `${baseStyle} ${rtlStyle}`;
+};
+
+const getComboboxInputStyle = (language: string) => {
+  const baseStyle = "w-full py-2 ps-3 pe-10 text-sm leading-5 text-gray-900 dark:text-white border border-gray-300 dark:border-secondary-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-secondary-700";
+  const rtlStyle = language === 'ar' ? 'text-right' : 'text-left';
+  return `${baseStyle} ${rtlStyle}`;
+};
 
 
 const InventoryIssueRequestsPage: React.FC = () => {
@@ -522,7 +537,7 @@ const InventoryIssueRequestsPage: React.FC = () => {
         <h1 className="text-3xl font-semibold text-gray-800 dark:text-white">{getLabel('inventoryIssueRequests')}</h1>
         <Button onClick={openModalForCreate} leftIcon={PlusIcon}>{getLabel('addNewInventoryIssueRequest')}</Button>
       </div>
-      <input type="text" placeholder={`${getLabel('search')}...`} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={commonInputStyle} />
+      <input type="text" placeholder={`${getLabel('search')}...`} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={getCommonInputStyle(language)} />
       <Table columns={columns} data={sortedRequests} keyExtractor={(req) => req.id} sortConfig={sortConfig} onSort={setSortConfig} />
 
 
@@ -531,27 +546,27 @@ const InventoryIssueRequestsPage: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-4 max-h-[80vh] overflow-y-auto overflow-x-hidden custom-scroll p-1">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-                <label htmlFor="dateCreated" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('requestDate')}</label>
-                <input type="date" name="dateCreated" id="dateCreated" value={formData.dateCreated} onChange={handleInputChange} required className={commonInputStyle} />
+                <label htmlFor="dateCreated" className={getLabelStyle(language)}>{getLabel('requestDate')}</label>
+                <input type="date" name="dateCreated" id="dateCreated" value={formData.dateCreated} onChange={handleInputChange} required className={getCommonInputStyle(language)} />
             </div>
             <div>
-                <label htmlFor="warehouseSource" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('warehouseSource')}</label>
-                <select name="warehouseSource" id="warehouseSource" value={formData.warehouseSource} onChange={handleInputChange} required className={commonInputStyle}>
+                <label htmlFor="warehouseSource" className={getLabelStyle(language)}>{getLabel('warehouseSource')}</label>
+                <select name="warehouseSource" id="warehouseSource" value={formData.warehouseSource} onChange={handleInputChange} required className={getCommonInputStyle(language)}>
                     <option value="main">{getLabel('mainWarehouse')}</option>
                     <option value="secondary">{getLabel('secondaryWarehouse')}</option>
                 </select>
             </div>
              <div>
-                <label htmlFor="maintenanceCardCombobox" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('maintenanceCard')}</label>
+                <label htmlFor="maintenanceCardCombobox" className={getLabelStyle(language)}>{getLabel('maintenanceCard')}</label>
                  <Combobox value={selectedMaintenanceCardForCombobox} onChange={(mc: MaintenanceCard | null) => {
                     setSelectedMaintenanceCardForCombobox(mc);
                     setFormData(prev => ({ ...prev, maintenanceCardId: mc ? mc.id : undefined }));
                     if(!mc) setMaintenanceCardInputQuery('');
                 }}>
-                    <div className="relative mt-1"> 
+                    <div className="relative mt-1">
                         <Combobox.Input
                             id="maintenanceCardCombobox"
-                            className={comboboxInputStyle}
+                            className={getComboboxInputStyle(language)}
                             displayValue={(mc: MaintenanceCard) => mc ? `${mc.internalId} - ${vehiclesMap[mc.vehicleId]?.make} ${vehiclesMap[mc.vehicleId]?.model} (${customersMap[mc.customerId]?.name}) - ${new Date(mc.dateCreated).toLocaleDateString(language)}` : ''}
                             onChange={(event) => setMaintenanceCardInputQuery(event.target.value)}
                             placeholder={getLabel('selectMaintenanceCardOptional')}
@@ -609,13 +624,13 @@ const InventoryIssueRequestsPage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
              <div>
-                <label htmlFor="requestedByEmployeeId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('requestedBy')}</label>
-                <select name="requestedByEmployeeId" id="requestedByEmployeeId" value={formData.requestedByEmployeeId} onChange={handleInputChange} required className={commonInputStyle} disabled>
+                <label htmlFor="requestedByEmployeeId" className={getLabelStyle(language)}>{getLabel('requestedBy')}</label>
+                <select name="requestedByEmployeeId" id="requestedByEmployeeId" value={formData.requestedByEmployeeId} onChange={handleInputChange} required className={getCommonInputStyle(language)} disabled>
                      {employees.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
                 </select>
             </div>
             <div>
-                <label htmlFor="receiverCombobox" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('receivedBy')}<span className="text-red-500">*</span></label>
+                <label htmlFor="receiverCombobox" className={getLabelStyle(language)}>{getLabel('receivedBy')}<span className="text-red-500">*</span></label>
                  <Combobox value={selectedReceiverEmployee} onChange={(employee: Employee | null) => {
                     setSelectedReceiverEmployee(employee);
                     setReceiverQuery(employee ? employee.name : '');
@@ -623,7 +638,7 @@ const InventoryIssueRequestsPage: React.FC = () => {
                     <div className="relative mt-1">
                         <Combobox.Input
                             id="receiverCombobox"
-                            className={comboboxInputStyle}
+                            className={getComboboxInputStyle(language)}
                             displayValue={(employee: Employee | null) => employee ? employee.name : receiverQuery }
                             onChange={(event) => {
                                 setReceiverQuery(event.target.value);
@@ -671,8 +686,8 @@ const InventoryIssueRequestsPage: React.FC = () => {
                 </Combobox>
             </div>
             <div>
-                <label htmlFor="issuedByEmployeeId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('storekeeper')}</label>
-                <select name="issuedByEmployeeId" id="issuedByEmployeeId" value={formData.issuedByEmployeeId} onChange={handleInputChange} className={commonInputStyle}>
+                <label htmlFor="issuedByEmployeeId" className={getLabelStyle(language)}>{getLabel('storekeeper')}</label>
+                <select name="issuedByEmployeeId" id="issuedByEmployeeId" value={formData.issuedByEmployeeId} onChange={handleInputChange} className={getCommonInputStyle(language)}>
                     <option value="">{getLabel('selectEmployee')}</option>
                      {employees.filter(e => e.role === 'Accountant' || e.role === 'Manager').map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
                 </select>
@@ -686,20 +701,20 @@ const InventoryIssueRequestsPage: React.FC = () => {
               const displayInfo = partInfo ? `${partInfo.name} (${partInfo.sku})` : getLabel('unknownPart');
               return (
                 <div key={item.id || index} className="grid grid-cols-12 gap-2 items-center mb-2 p-2 border-b dark:border-gray-700">
-                    <div className="col-span-5"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('part')}</label><input type="text" value={displayInfo} readOnly className={`${commonInputStyle} bg-gray-100 dark:bg-secondary-600 text-gray-900 dark:text-white`} /></div>
-                    <div className="col-span-2"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('quantityRequested')}</label><input type="number" value={item.quantityRequested} onChange={e => handleRequestItemChange(index, 'quantityRequested', e.target.value)} className={commonInputStyle} /></div>
-                    <div className="col-span-3"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('notes')}</label><input type="text" name={`itemNotes-${index}`} value={item.notes || ''} onChange={e => handleRequestItemChange(index, 'notes', e.target.value)} className={commonInputStyle} /></div>
+                    <div className="col-span-5"><label className={`text-xs ${language === 'ar' ? 'text-right' : 'text-left'} text-gray-700 dark:text-gray-300`}>{getLabel('part')}</label><input type="text" value={displayInfo} readOnly className={`${getCommonInputStyle(language)} bg-gray-100 dark:bg-secondary-600 text-gray-900 dark:text-white`} /></div>
+                    <div className="col-span-2"><label className={`text-xs ${language === 'ar' ? 'text-right' : 'text-left'} text-gray-700 dark:text-gray-300`}>{getLabel('quantityRequested')}</label><input type="number" value={item.quantityRequested} onChange={e => handleRequestItemChange(index, 'quantityRequested', e.target.value)} className={getCommonInputStyle(language)} /></div>
+                    <div className="col-span-3"><label className={`text-xs ${language === 'ar' ? 'text-right' : 'text-left'} text-gray-700 dark:text-gray-300`}>{getLabel('notes')}</label><input type="text" name={`itemNotes-${index}`} value={item.notes || ''} onChange={e => handleRequestItemChange(index, 'notes', e.target.value)} className={getCommonInputStyle(language)} /></div>
                     <div className="col-span-1 flex items-end"><Button type="button" variant="outline" size="sm" onClick={() => openPartDetailModal(item.partId)} title={getLabel('partDetails')}><EyeIcon className="h-4 w-4" /></Button></div>
                     <div className="col-span-1 flex items-end"><Button type="button" variant="danger" size="sm" onClick={() => removeRequestItem(item.id)}><TrashIcon className="h-4 w-4" /></Button></div>
                 </div>
               );
             })}
             <div className="grid grid-cols-12 gap-2 items-end mt-2">
-                <div className="col-span-6"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('part')}</label>
+                <div className="col-span-6"><label className={`text-xs ${language === 'ar' ? 'text-right' : 'text-left'} text-gray-700 dark:text-gray-300`}>{getLabel('part')}</label>
                     <Combobox value={selectedPartForCombobox} onChange={setSelectedPartForCombobox}>
                         <div className="relative mt-1">
                             <Combobox.Input
-                                className={comboboxInputStyle}
+                                className={getComboboxInputStyle(language)}
                                 displayValue={(p: MappedPartForCombobox) => p ? `${p.name} ${p.sku ? '('+p.sku+')' : ''} - ${getLabel('available')}: ${p.availableQuantity}` : ''}
                                 onChange={(event) => setPartInputQuery(event.target.value)}
                                 placeholder={getLabel('searchOrSelectPart')}
@@ -748,12 +763,12 @@ const InventoryIssueRequestsPage: React.FC = () => {
                         </Transition>
                     </Combobox>
                 </div>
-                <div className="col-span-3"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('quantity')}</label><input type="number" value={newRequestItemQuantity} onChange={e => setNewRequestItemQuantity(parseInt(e.target.value) || 1)} min="1" className={commonInputStyle} /></div>
+                <div className="col-span-3"><label className={`text-xs ${language === 'ar' ? 'text-right' : 'text-left'} text-gray-700 dark:text-gray-300`}>{getLabel('quantity')}</label><input type="number" value={newRequestItemQuantity} onChange={e => setNewRequestItemQuantity(parseInt(e.target.value) || 1)} min="1" className={getCommonInputStyle(language)} /></div>
                 <div className="col-span-3"><Button type="button" variant="secondary" onClick={addRequestItem} leftIcon={PlusIcon}>{getLabel('addPartToRequest')}</Button></div>
             </div>
           </fieldset>
 
-          <div><label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('notes')}</label><textarea name="notes" id="notes" value={formData.notes || ''} onChange={handleInputChange} rows={2} className={commonInputStyle}></textarea></div>
+          <div><label htmlFor="notes" className={getLabelStyle(language)}>{getLabel('notes')}</label><textarea name="notes" id="notes" value={formData.notes || ''} onChange={handleInputChange} rows={2} className={getCommonInputStyle(language)}></textarea></div>
           <div className="pt-4 flex justify-end space-x-3 rtl:space-x-reverse border-t dark:border-secondary-600"><Button type="button" variant="secondary" onClick={closeModal}>{getLabel('cancel')}</Button><Button type="submit" variant="primary">{getLabel('save')}</Button></div>
         </form>
       </Modal>

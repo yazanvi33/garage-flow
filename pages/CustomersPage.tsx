@@ -9,7 +9,17 @@ import { Customer } from '../types';
 import { MOCK_CUSTOMERS } from '../constants';
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 
-const commonInputStyle = "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm dark:bg-secondary-700 dark:border-secondary-600 dark:text-white";
+const getCommonInputStyle = (language: string) => {
+  const baseStyle = "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm dark:bg-secondary-700 dark:border-secondary-600 dark:text-white";
+  const rtlStyle = language === 'ar' ? 'text-right' : 'text-left';
+  return `${baseStyle} ${rtlStyle}`;
+};
+
+const getLabelStyle = (language: string) => {
+  const baseStyle = "block text-sm font-medium text-gray-700 dark:text-gray-300";
+  const rtlStyle = language === 'ar' ? 'text-right' : 'text-left';
+  return `${baseStyle} ${rtlStyle}`;
+};
 
 const ALL_CUSTOMER_COLUMNS_CONFIG = (getLabel: (key: string) => string, currency: { symbol: string }): Column<Customer>[] => [
     { header: 'internalId', accessor: 'internalId', sortable: true },
@@ -191,37 +201,37 @@ const CustomersPage: React.FC = () => {
             <Button onClick={openModalForCreate} leftIcon={PlusIcon}>{getLabel('addNewCustomer')}</Button>
         </div>
       </div>
-      <input type="text" placeholder={`${getLabel('search')}...`} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={commonInputStyle} />
+      <input type="text" placeholder={`${getLabel('search')}...`} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={getCommonInputStyle(language)} />
       <Table columns={displayedTableColumns} data={filteredAndSortedCustomers} keyExtractor={(customer) => customer.id} sortConfig={sortConfig} onSort={setSortConfig} />
       <Modal isOpen={isModalOpen} onClose={closeModal} title={editingCustomer ? `${getLabel('edit')} ${getLabel('customer')}` : getLabel('addNewCustomer')} size="lg">
         <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto custom-scroll">
           {editingCustomer && (
             <div>
-                <label htmlFor="internalId_display" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('internalId')}</label>
-                <input type="text" name="internalId_display" id="internalId_display" value={editingCustomer.internalId} readOnly className={`${commonInputStyle} bg-gray-100 dark:bg-secondary-600`} />
+                <label htmlFor="internalId_display" className={getLabelStyle(language)}>{getLabel('internalId')}</label>
+                <input type="text" name="internalId_display" id="internalId_display" value={editingCustomer.internalId} readOnly className={`${getCommonInputStyle(language)} bg-gray-100 dark:bg-secondary-600`} />
             </div>
           )}
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('customerName')}</label>
-            <input type="text" name="name" id="name" value={formData.name} onChange={handleInputChange} required className={commonInputStyle} />
+            <label htmlFor="name" className={getLabelStyle(language)}>{getLabel('customerName')}</label>
+            <input type="text" name="name" id="name" value={formData.name} onChange={handleInputChange} required className={getCommonInputStyle(language)} />
           </div>
           <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('phone')}</label>
-            <input type="tel" name="phone" id="phone" value={formData.phone} onChange={handleInputChange} required className={commonInputStyle} />
+            <label htmlFor="phone" className={getLabelStyle(language)}>{getLabel('phone')}</label>
+            <input type="tel" name="phone" id="phone" value={formData.phone} onChange={handleInputChange} required className={getCommonInputStyle(language)} />
           </div>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('email')}</label>
-            <input type="email" name="email" id="email" value={formData.email || ''} onChange={handleInputChange} className={commonInputStyle} />
+            <label htmlFor="email" className={getLabelStyle(language)}>{getLabel('email')}</label>
+            <input type="email" name="email" id="email" value={formData.email || ''} onChange={handleInputChange} className={getCommonInputStyle(language)} />
           </div>
           <div>
-            <label htmlFor="address" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('address')}</label>
-            <textarea name="address" id="address" value={formData.address || ''} onChange={handleInputChange} rows={2} className={commonInputStyle}></textarea>
+            <label htmlFor="address" className={getLabelStyle(language)}>{getLabel('address')}</label>
+            <textarea name="address" id="address" value={formData.address || ''} onChange={handleInputChange} rows={2} className={getCommonInputStyle(language)}></textarea>
           </div>
           <div>
-            <label htmlFor="openingBalance" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('openingBalance')}</label>
-            <input type="number" step="any" name="openingBalance" id="openingBalance" value={formData.openingBalance} onChange={handleInputChange} className={commonInputStyle} placeholder="0.00" />
+            <label htmlFor="openingBalance" className={getLabelStyle(language)}>{getLabel('openingBalance')}</label>
+            <input type="number" step="any" name="openingBalance" id="openingBalance" value={formData.openingBalance} onChange={handleInputChange} className={getCommonInputStyle(language)} placeholder="0.00" />
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              {getLabel('language') === 'ar' ? 'القيم الموجبة تعني أن العميل مدين لك، والقيم السالبة تعني أن لديه رصيد' : 'Positive values mean customer owes you, negative values mean customer has credit'}
+              {language === 'ar' ? 'القيم الموجبة تعني أن العميل مدين لك، والقيم السالبة تعني أن لديه رصيد' : 'Positive values mean customer owes you, negative values mean customer has credit'}
             </p>
           </div>
           <div className="pt-2 flex justify-end space-x-3 rtl:space-x-reverse">

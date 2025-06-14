@@ -9,7 +9,17 @@ import Modal from '../components/Modal';
 import ColumnToggleButton from '../components/ColumnToggleButton'; // New import
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 
-const commonInputStyle = "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm dark:bg-secondary-700 dark:border-secondary-600 dark:text-white";
+const getCommonInputStyle = (language: string) => {
+  const baseStyle = "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm dark:bg-secondary-700 dark:border-secondary-600 dark:text-white";
+  const rtlStyle = language === 'ar' ? 'text-right' : 'text-left';
+  return `${baseStyle} ${rtlStyle}`;
+};
+
+const getLabelStyle = (language: string) => {
+  const baseStyle = "block text-sm font-medium text-gray-700 dark:text-gray-300";
+  const rtlStyle = language === 'ar' ? 'text-right' : 'text-left';
+  return `${baseStyle} ${rtlStyle}`;
+};
 
 // Define all possible columns for the vehicle table
 const ALL_VEHICLE_COLUMNS_CONFIG = (getLabel: (key: string) => string, customers: typeof MOCK_CUSTOMERS): Column<Vehicle>[] => [
@@ -35,7 +45,7 @@ const ALL_VEHICLE_COLUMNS_CONFIG = (getLabel: (key: string) => string, customers
 const VehiclesPage: React.FC = () => {
   const context = useContext(AppContext);
   if (!context) return <p>Loading context...</p>;
-  const { getLabel } = context;
+  const { getLabel, language } = context;
 
   const [vehicles, setVehicles] = useState<Vehicle[]>(MOCK_VEHICLES);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -188,41 +198,41 @@ const VehiclesPage: React.FC = () => {
             <Button onClick={openModalForCreate} leftIcon={PlusIcon}>{getLabel('addNewVehicle')}</Button>
         </div>
       </div>
-       <input type="text" placeholder={`${getLabel('search')}...`} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={commonInputStyle}/>
+       <input type="text" placeholder={`${getLabel('search')}...`} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={getCommonInputStyle(language)}/>
       <Table columns={displayedTableColumns} data={filteredAndSortedVehicles} keyExtractor={(vehicle) => vehicle.id} sortConfig={sortConfig} onSort={setSortConfig} />
       
       <Modal isOpen={isModalOpen} onClose={closeModal} title={editingVehicle ? `${getLabel('edit')} ${getLabel('vehicle')}` : getLabel('addNewVehicle')} size="2xl">
         <form onSubmit={handleSubmit} className="space-y-4">
           {editingVehicle && (
              <div>
-                <label htmlFor="internalId_display" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('internalId')}</label>
-                <input type="text" name="internalId_display" id="internalId_display" value={editingVehicle.internalId} readOnly className={`${commonInputStyle} bg-gray-100 dark:bg-secondary-600`} />
+                <label htmlFor="internalId_display" className={getLabelStyle(language)}>{getLabel('internalId')}</label>
+                <input type="text" name="internalId_display" id="internalId_display" value={editingVehicle.internalId} readOnly className={`${getCommonInputStyle(language)} bg-gray-100 dark:bg-secondary-600`} />
             </div>
           )}
           <div>
-            <label htmlFor="customerId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('customer')}</label>
-            <select name="customerId" id="customerId" value={formData.customerId} onChange={handleInputChange} required className={commonInputStyle}>
+            <label htmlFor="customerId" className={getLabelStyle(language)}>{getLabel('customer')}</label>
+            <select name="customerId" id="customerId" value={formData.customerId} onChange={handleInputChange} required className={getCommonInputStyle(language)}>
               <option value="">{getLabel('selectCustomer')}</option>
               {customers.map(c => <option key={c.id} value={c.id}>{c.name} ({c.internalId})</option>)}
             </select>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label htmlFor="make" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('make')}</label><input type="text" name="make" id="make" value={formData.make} onChange={handleInputChange} required className={commonInputStyle} /></div>
-            <div><label htmlFor="model" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('model')}</label><input type="text" name="model" id="model" value={formData.model} onChange={handleInputChange} required className={commonInputStyle} /></div>
+            <div><label htmlFor="make" className={getLabelStyle(language)}>{getLabel('make')}</label><input type="text" name="make" id="make" value={formData.make} onChange={handleInputChange} required className={getCommonInputStyle(language)} /></div>
+            <div><label htmlFor="model" className={getLabelStyle(language)}>{getLabel('model')}</label><input type="text" name="model" id="model" value={formData.model} onChange={handleInputChange} required className={getCommonInputStyle(language)} /></div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label htmlFor="year" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('year')}</label><input type="number" name="year" id="year" value={formData.year || ''} onChange={handleInputChange} required className={commonInputStyle} /></div>
-            <div><label htmlFor="licensePlate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('licensePlate')}</label><input type="text" name="licensePlate" id="licensePlate" value={formData.licensePlate} onChange={handleInputChange} required className={commonInputStyle} /></div>
+            <div><label htmlFor="year" className={getLabelStyle(language)}>{getLabel('year')}</label><input type="number" name="year" id="year" value={formData.year || ''} onChange={handleInputChange} required className={getCommonInputStyle(language)} /></div>
+            <div><label htmlFor="licensePlate" className={getLabelStyle(language)}>{getLabel('licensePlate')}</label><input type="text" name="licensePlate" id="licensePlate" value={formData.licensePlate} onChange={handleInputChange} required className={getCommonInputStyle(language)} /></div>
           </div>
-          <div><label htmlFor="vin" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('vin')}</label><input type="text" name="vin" id="vin" value={formData.vin} onChange={handleInputChange} required className={commonInputStyle} /></div>
-          
+          <div><label htmlFor="vin" className={getLabelStyle(language)}>{getLabel('vin')}</label><input type="text" name="vin" id="vin" value={formData.vin} onChange={handleInputChange} required className={getCommonInputStyle(language)} /></div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label htmlFor="color" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('color')}</label><input type="text" name="color" id="color" value={formData.color || ''} onChange={handleInputChange} className={commonInputStyle} /></div>
-            <div><label htmlFor="tireSize" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('tireSize')}</label><input type="text" name="tireSize" id="tireSize" value={formData.tireSize || ''} onChange={handleInputChange} className={commonInputStyle} /></div>
+            <div><label htmlFor="color" className={getLabelStyle(language)}>{getLabel('color')}</label><input type="text" name="color" id="color" value={formData.color || ''} onChange={handleInputChange} className={getCommonInputStyle(language)} /></div>
+            <div><label htmlFor="tireSize" className={getLabelStyle(language)}>{getLabel('tireSize')}</label><input type="text" name="tireSize" id="tireSize" value={formData.tireSize || ''} onChange={handleInputChange} className={getCommonInputStyle(language)} /></div>
           </div>
            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label htmlFor="engineCylinders" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('engineCylinders')}</label><input type="number" name="engineCylinders" id="engineCylinders" value={formData.engineCylinders || ''} onChange={handleInputChange} className={commonInputStyle} /></div>
-            <div><label htmlFor="engineNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('engineNumber')}</label><input type="text" name="engineNumber" id="engineNumber" value={formData.engineNumber || ''} onChange={handleInputChange} className={commonInputStyle} /></div>
+            <div><label htmlFor="engineCylinders" className={getLabelStyle(language)}>{getLabel('engineCylinders')}</label><input type="number" name="engineCylinders" id="engineCylinders" value={formData.engineCylinders || ''} onChange={handleInputChange} className={getCommonInputStyle(language)} /></div>
+            <div><label htmlFor="engineNumber" className={getLabelStyle(language)}>{getLabel('engineNumber')}</label><input type="text" name="engineNumber" id="engineNumber" value={formData.engineNumber || ''} onChange={handleInputChange} className={getCommonInputStyle(language)} /></div>
           </div>
 
           <div className="pt-2 flex justify-end space-x-3 rtl:space-x-reverse"><Button type="button" variant="secondary" onClick={closeModal}>{getLabel('cancel')}</Button><Button type="submit" variant="primary">{getLabel('save')}</Button></div>

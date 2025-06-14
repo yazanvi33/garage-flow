@@ -14,7 +14,17 @@ interface CalculatedPart extends SparePart {
   outgoingQuantity: number;
 }
 
-const commonInputStyle = "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm dark:bg-secondary-700 dark:border-secondary-600 dark:text-white";
+const getCommonInputStyle = (language: string) => {
+  const baseStyle = "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm dark:bg-secondary-700 dark:border-secondary-600 dark:text-white";
+  const rtlStyle = language === 'ar' ? 'text-right' : 'text-left';
+  return `${baseStyle} ${rtlStyle}`;
+};
+
+const getLabelStyle = (language: string) => {
+  const baseStyle = "block text-sm font-medium text-gray-700 dark:text-gray-300";
+  const rtlStyle = language === 'ar' ? 'text-right' : 'text-left';
+  return `${baseStyle} ${rtlStyle}`;
+};
 
 const ALL_PARTS_COLUMNS_CONFIG = (
     getLabel: (key: string) => string,
@@ -240,37 +250,37 @@ const PartsPage: React.FC = () => {
             <Button onClick={openModalForCreate} leftIcon={PlusIcon}>{getLabel('addNewPart')}</Button>
         </div>
       </div>
-      <input type="text" placeholder={`${getLabel('search')}...`} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={commonInputStyle} />
+      <input type="text" placeholder={`${getLabel('search')}...`} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={getCommonInputStyle(language)} />
       <Table columns={displayedTableColumns} data={filteredAndSortedParts} keyExtractor={(part) => part.id} sortConfig={sortConfig} onSort={setSortConfig} />
       <Modal isOpen={isModalOpen} onClose={closeModal} title={editingPart ? getLabel('editPart') : getLabel('addNewPart')} size="2xl">
         <form onSubmit={handleSubmit} className="space-y-4">
           {editingPart && (
              <div>
-                <label htmlFor="internalId_display" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('internalId')}</label>
-                <input type="text" name="internalId_display" id="internalId_display" value={editingPart.internalId} readOnly className={`${commonInputStyle} bg-gray-100 dark:bg-secondary-600`} />
+                <label htmlFor="internalId_display" className={getLabelStyle(language)}>{getLabel('internalId')}</label>
+                <input type="text" name="internalId_display" id="internalId_display" value={editingPart.internalId} readOnly className={`${getCommonInputStyle(language)} bg-gray-100 dark:bg-secondary-600`} />
             </div>
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('name')}</label><input type="text" name="name" id="name" value={formData.name} onChange={handleInputChange} required className={commonInputStyle} /></div>
-            <div><label htmlFor="sku" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('sku')}</label><input type="text" name="sku" id="sku" value={formData.sku} onChange={handleInputChange} required className={commonInputStyle} /></div>
+            <div><label htmlFor="name" className={getLabelStyle(language)}>{getLabel('name')}</label><input type="text" name="name" id="name" value={formData.name} onChange={handleInputChange} required className={getCommonInputStyle(language)} /></div>
+            <div><label htmlFor="sku" className={getLabelStyle(language)}>{getLabel('sku')}</label><input type="text" name="sku" id="sku" value={formData.sku} onChange={handleInputChange} required className={getCommonInputStyle(language)} /></div>
           </div>
            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label htmlFor="condition" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('partCondition')}</label>
-              <select name="condition" id="condition" value={formData.condition} onChange={handleInputChange} className={commonInputStyle}>
+            <div><label htmlFor="condition" className={getLabelStyle(language)}>{getLabel('partCondition')}</label>
+              <select name="condition" id="condition" value={formData.condition} onChange={handleInputChange} className={getCommonInputStyle(language)}>
                 <option value="New">{getLabel('New')}</option>
                 <option value="Used">{getLabel('Used')}</option>
               </select>
             </div>
-            <div><label htmlFor="initialStock" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('initialStock')}</label><input type="number" name="initialStock" id="initialStock" value={formData.initialStock || ''} onChange={handleInputChange} required className={commonInputStyle} /></div>
+            <div><label htmlFor="initialStock" className={getLabelStyle(language)}>{getLabel('initialStock')}</label><input type="number" name="initialStock" id="initialStock" value={formData.initialStock || ''} onChange={handleInputChange} required className={getCommonInputStyle(language)} /></div>
            {/* QuantityInStock field removed from here for new part creation as per request */}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label htmlFor="purchasePrice" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('purchasePrice')}</label><input type="number" step="any" name="purchasePrice" id="purchasePrice" value={formData.purchasePrice} onChange={handleInputChange} required className={commonInputStyle} /></div>
-            <div><label htmlFor="sellingPrice" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('sellingPrice')}</label><input type="number" step="any" name="sellingPrice" id="sellingPrice" value={formData.sellingPrice} onChange={handleInputChange} required className={commonInputStyle} /></div>
+            <div><label htmlFor="purchasePrice" className={getLabelStyle(language)}>{getLabel('purchasePrice')}</label><input type="number" step="any" name="purchasePrice" id="purchasePrice" value={formData.purchasePrice} onChange={handleInputChange} required className={getCommonInputStyle(language)} /></div>
+            <div><label htmlFor="sellingPrice" className={getLabelStyle(language)}>{getLabel('sellingPrice')}</label><input type="number" step="any" name="sellingPrice" id="sellingPrice" value={formData.sellingPrice} onChange={handleInputChange} required className={getCommonInputStyle(language)} /></div>
           </div>
           {/* SupplierId field removed from here for new part creation as per request */}
-          <div><label htmlFor="compatibleVehicles" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('compatibleVehicles')}</label><input type="text" name="compatibleVehicles" id="compatibleVehicles" value={formData.compatibleVehicles} onChange={handleInputChange} placeholder="e.g., Toyota Camry 2020, Honda Civic 2018-2022" className={commonInputStyle} /></div>
-          <div><label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('description') || 'Description'}</label><textarea name="description" id="description" value={formData.description} onChange={handleInputChange} rows={2} className={commonInputStyle}></textarea></div>
+          <div><label htmlFor="compatibleVehicles" className={getLabelStyle(language)}>{getLabel('compatibleVehicles')}</label><input type="text" name="compatibleVehicles" id="compatibleVehicles" value={formData.compatibleVehicles} onChange={handleInputChange} placeholder="e.g., Toyota Camry 2020, Honda Civic 2018-2022" className={getCommonInputStyle(language)} /></div>
+          <div><label htmlFor="description" className={getLabelStyle(language)}>{getLabel('description') || 'Description'}</label><textarea name="description" id="description" value={formData.description} onChange={handleInputChange} rows={2} className={getCommonInputStyle(language)}></textarea></div>
           <div className="pt-2 flex justify-end space-x-3 rtl:space-x-reverse"><Button type="button" variant="secondary" onClick={closeModal}>{getLabel('cancel')}</Button><Button type="submit" variant="primary">{getLabel('save')}</Button></div>
         </form>
       </Modal>

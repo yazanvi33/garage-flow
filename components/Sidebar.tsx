@@ -73,7 +73,7 @@ const Sidebar: React.FC = () => {
         </Link>
         {currentUser && (
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {getLabel(USER_ROLES_CONFIG[currentUser.role].name_en)} ({currentUser.name})
+            {language === 'ar' ? USER_ROLES_CONFIG[currentUser.role].name_ar : USER_ROLES_CONFIG[currentUser.role].name_en} ({currentUser.name})
           </p>
         )}
       </div>

@@ -119,7 +119,7 @@ const Header: React.FC = () => {
                 <div className="px-4 py-3">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">{currentUser.name}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{currentUser.username}</p>
-                  <p className="text-xs text-primary-600 dark:text-primary-400">{getLabel(USER_ROLES_CONFIG[currentUser.role].name_en)}</p>
+                  <p className="text-xs text-primary-600 dark:text-primary-400">{language === 'ar' ? USER_ROLES_CONFIG[currentUser.role].name_ar : USER_ROLES_CONFIG[currentUser.role].name_en}</p>
                 </div>
                 
                 <div className="border-t border-gray-200 dark:border-secondary-600 my-1"></div>

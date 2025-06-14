@@ -1,6 +1,7 @@
 
-import React, { Fragment } from 'react';
+import React, { Fragment, useContext } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
+import { AppContext } from '../context/AppContext';
 
 
 interface ModalProps {
@@ -12,6 +13,10 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, size = 'md' }) => {
+  const context = useContext(AppContext);
+  const language = context?.language || 'en';
+  const isRTL = language === 'ar';
+
   const sizeClasses = {
     sm: 'sm:max-w-sm',
     md: 'sm:max-w-md',
@@ -49,16 +54,16 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, size = 
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className={`relative transform overflow-hidden rounded-lg bg-white dark:bg-secondary-800 text-left shadow-xl transition-all sm:my-8 sm:w-full ${sizeClasses[size]}`}>
+              <Dialog.Panel className={`relative transform overflow-hidden rounded-lg bg-white dark:bg-secondary-800 shadow-xl transition-all sm:my-8 sm:w-full ${sizeClasses[size]} ${isRTL ? 'text-right' : 'text-left'}`}>
                 <div className="bg-white dark:bg-secondary-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <div className="sm:flex sm:items-start">
-                    <div className="mt-3 text-center sm:mt-0 sm:text-left w-full">
-                      <Dialog.Title as="h3" className="text-lg font-semibold leading-6 text-gray-900 dark:text-white">
+                    <div className={`mt-3 text-center sm:mt-0 w-full ${isRTL ? 'sm:text-right' : 'sm:text-left'}`}>
+                      <Dialog.Title as="h3" className={`text-lg font-semibold leading-6 text-gray-900 dark:text-white ${isRTL ? 'text-right' : 'text-left'}`}>
                         {title}
                       </Dialog.Title>
                       <button
                         type="button"
-                        className="absolute top-4 end-4 text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-300"
+                        className={`absolute top-4 text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-300 ${isRTL ? 'start-4' : 'end-4'}`}
                         onClick={onClose}
                       >
                         <span className="sr-only">Close</span>

@@ -12,8 +12,23 @@ import { PlusIcon, PencilIcon, TrashIcon, ClipboardDocumentListIcon, ChevronUpDo
 import { Combobox, Transition } from '@headlessui/react';
 import { isDateInRange } from '../utils/dateUtils';
 
-const commonInputStyle = "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm dark:bg-secondary-700 dark:border-secondary-600 dark:text-white";
-const comboboxInputStyle = "w-full py-2 ps-3 pe-10 text-sm leading-5 text-gray-900 dark:text-white border border-gray-300 dark:border-secondary-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-secondary-700 focus:outline-none";
+const getCommonInputStyle = (language: string) => {
+  const baseStyle = "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm dark:bg-secondary-700 dark:border-secondary-600 dark:text-white";
+  const rtlStyle = language === 'ar' ? 'text-right' : 'text-left';
+  return `${baseStyle} ${rtlStyle}`;
+};
+
+const getLabelStyle = (language: string) => {
+  const baseStyle = "block text-sm font-medium text-gray-700 dark:text-gray-300";
+  const rtlStyle = language === 'ar' ? 'text-right' : 'text-left';
+  return `${baseStyle} ${rtlStyle}`;
+};
+
+const getComboboxInputStyle = (language: string) => {
+  const baseStyle = "w-full py-2 ps-3 pe-10 text-sm leading-5 text-gray-900 dark:text-white border border-gray-300 dark:border-secondary-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-secondary-700 focus:outline-none";
+  const rtlStyle = language === 'ar' ? 'text-right' : 'text-left';
+  return `${baseStyle} ${rtlStyle}`;
+};
 
 
 const ALL_MAINTENANCE_CARD_COLUMNS_CONFIG = (
@@ -220,7 +235,7 @@ const MaintenanceCardsPage: React.FC = () => {
         if (name === 'status' && value === 'Completed') {
             setFormData(prev => ({
                 ...prev,
-                [name]: numValue,
+                [name]: value,
                 dateCompleted: prev.dateCompleted || new Date().toISOString()
             }));
         } else {
@@ -429,20 +444,20 @@ const MaintenanceCardsPage: React.FC = () => {
             <Button onClick={openModalForCreate} leftIcon={PlusIcon}>{getLabel('addNewMaintenanceCard')}</Button>
         </div>
       </div>
-      <input type="text" placeholder={`${getLabel('search')}...`} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={commonInputStyle}/>
+      <input type="text" placeholder={`${getLabel('search')}...`} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={getCommonInputStyle(language)}/>
       <Table columns={displayedTableColumns} data={sortedCards} keyExtractor={(card) => card.id} sortConfig={sortConfig} onSort={setSortConfig} />
       
       <Modal isOpen={isModalOpen} onClose={closeModal} title={editingCard ? getLabel('editMaintenanceCard') : getLabel('addNewMaintenanceCard')} size="3xl">
         <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto custom-scroll p-1">
           {editingCard && (
              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('internalId')}</label>
-                <input type="text" value={editingCard.internalId} readOnly className={`${commonInputStyle} bg-gray-100 dark:bg-secondary-600`} />
+                <label className={getLabelStyle(language)}>{getLabel('internalId')}</label>
+                <input type="text" value={editingCard.internalId} readOnly className={`${getCommonInputStyle(language)} bg-gray-100 dark:bg-secondary-600`} />
             </div>
           )}
            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label htmlFor="customerCombobox" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('customer')}</label>
+                    <label htmlFor="customerCombobox" className={getLabelStyle(language)}>{getLabel('customer')}</label>
                     <Combobox value={selectedCustomerForCombobox} onChange={(customer: Customer | null) => {
                         setSelectedCustomerForCombobox(customer);
                         setFormData(prev => ({
@@ -457,7 +472,7 @@ const MaintenanceCardsPage: React.FC = () => {
                         <div className="relative mt-1">
                             <Combobox.Input
                                 id="customerCombobox"
-                                className={comboboxInputStyle}
+                                className={getComboboxInputStyle(language)}
                                 displayValue={(customer: Customer) => customer?.name || ''}
                                 onChange={(event) => {
                                     setCustomerInputQuery(event.target.value);
@@ -516,14 +531,14 @@ const MaintenanceCardsPage: React.FC = () => {
                     </Combobox>
                 </div>
                 <div>
-                    <label htmlFor="vehicleId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('vehicle')}</label>
-                    <select 
-                        name="vehicleId" 
-                        id="vehicleId" 
-                        value={formData.vehicleId} 
-                        onChange={handleInputChange} 
-                        required 
-                        className={commonInputStyle}
+                    <label htmlFor="vehicleId" className={getLabelStyle(language)}>{getLabel('vehicle')}</label>
+                    <select
+                        name="vehicleId"
+                        id="vehicleId"
+                        value={formData.vehicleId}
+                        onChange={handleInputChange}
+                        required
+                        className={getCommonInputStyle(language)}
                         disabled={!formData.customerId}
                     >
                         <option value="">{formData.customerId ? getLabel('selectVehicle') : getLabel('selectCustomerFirst') || 'Select customer first'}</option>
@@ -534,53 +549,53 @@ const MaintenanceCardsPage: React.FC = () => {
                     </select>
                 </div>
            </div>
-            <div><label htmlFor="reportedIssues" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('reportedIssues')} ({language === 'ar' ? 'افصل بينها بفاصلة' : 'Comma separated'})</label>
-                <textarea name="reportedIssues" id="reportedIssues" value={formData.reportedIssuesText || ''} onChange={handleInputChange} rows={2} className={commonInputStyle} placeholder="مثال: تغيير زيت وفلتر, فحص الفرامل, صوت غريب من المحرك"></textarea>
+            <div><label htmlFor="reportedIssues" className={getLabelStyle(language)}>{getLabel('reportedIssues')} ({language === 'ar' ? 'افصل بينها بفاصلة' : 'Comma separated'})</label>
+                <textarea name="reportedIssues" id="reportedIssues" value={formData.reportedIssuesText || ''} onChange={handleInputChange} rows={2} className={getCommonInputStyle(language)} placeholder="مثال: تغيير زيت وفلتر, فحص الفرامل, صوت غريب من المحرك"></textarea>
             </div>
-            <div><label htmlFor="faultDescription" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('faultDescription')}</label>
-                <textarea name="faultDescription" id="faultDescription" value={formData.faultDescription || ''} onChange={handleInputChange} rows={3} className={commonInputStyle}></textarea>
+            <div><label htmlFor="faultDescription" className={getLabelStyle(language)}>{getLabel('faultDescription')}</label>
+                <textarea name="faultDescription" id="faultDescription" value={formData.faultDescription || ''} onChange={handleInputChange} rows={3} className={getCommonInputStyle(language)}></textarea>
             </div>
-             <div><label htmlFor="causeOfFailure" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('causeOfFailure')}</label>
-                <textarea name="causeOfFailure" id="causeOfFailure" value={formData.causeOfFailure || ''} onChange={handleInputChange} rows={3} className={commonInputStyle}></textarea>
+             <div><label htmlFor="causeOfFailure" className={getLabelStyle(language)}>{getLabel('causeOfFailure')}</label>
+                <textarea name="causeOfFailure" id="causeOfFailure" value={formData.causeOfFailure || ''} onChange={handleInputChange} rows={3} className={getCommonInputStyle(language)}></textarea>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                 <div><label htmlFor="odometerIn" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('odometerIn')}</label>
-                    <input type="number" name="odometerIn" id="odometerIn" value={formData.odometerIn || ''} onChange={handleInputChange} className={commonInputStyle} />
+                 <div><label htmlFor="odometerIn" className={getLabelStyle(language)}>{getLabel('odometerIn')}</label>
+                    <input type="number" name="odometerIn" id="odometerIn" value={formData.odometerIn || ''} onChange={handleInputChange} className={getCommonInputStyle(language)} />
                 </div>
-                <div><label htmlFor="fuelLevelIn" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('fuelLevelIn')}</label>
-                    <select name="fuelLevelIn" id="fuelLevelIn" value={formData.fuelLevelIn || ''} onChange={handleInputChange} className={commonInputStyle}>
+                <div><label htmlFor="fuelLevelIn" className={getLabelStyle(language)}>{getLabel('fuelLevelIn')}</label>
+                    <select name="fuelLevelIn" id="fuelLevelIn" value={formData.fuelLevelIn || ''} onChange={handleInputChange} className={getCommonInputStyle(language)}>
                         <option value="">-- {getLabel('select')} --</option>
                         {FUEL_LEVEL_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{language === 'ar' ? opt.label_ar : opt.label_en}</option>)}
                     </select>
                 </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div><label htmlFor="odometerOut" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('odometerOut')}</label>
-                    <input type="number" name="odometerOut" id="odometerOut" value={formData.odometerOut || ''} onChange={handleInputChange} className={commonInputStyle} />
+                <div><label htmlFor="odometerOut" className={getLabelStyle(language)}>{getLabel('odometerOut')}</label>
+                    <input type="number" name="odometerOut" id="odometerOut" value={formData.odometerOut || ''} onChange={handleInputChange} className={getCommonInputStyle(language)} />
                 </div>
-                 <div><label htmlFor="fuelLevelOut" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('fuelLevelOut')}</label>
-                    <select name="fuelLevelOut" id="fuelLevelOut" value={formData.fuelLevelOut || ''} onChange={handleInputChange} className={commonInputStyle}>
+                 <div><label htmlFor="fuelLevelOut" className={getLabelStyle(language)}>{getLabel('fuelLevelOut')}</label>
+                    <select name="fuelLevelOut" id="fuelLevelOut" value={formData.fuelLevelOut || ''} onChange={handleInputChange} className={getCommonInputStyle(language)}>
                         <option value="">-- {getLabel('select')} --</option>
                         {FUEL_LEVEL_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{language === 'ar' ? opt.label_ar : opt.label_en}</option>)}
                     </select>
                 </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div><label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('status')}</label>
-                    <select name="status" id="status" value={formData.status} onChange={handleInputChange} required className={commonInputStyle}>
+                <div><label htmlFor="status" className={getLabelStyle(language)}>{getLabel('status')}</label>
+                    <select name="status" id="status" value={formData.status} onChange={handleInputChange} required className={getCommonInputStyle(language)}>
                         {(['Pending', 'In Progress', 'Completed', 'Cancelled'] as MaintenanceCard['status'][]).map(s => <option key={s} value={s}>{getLabel(s.replace(/\s/g,''))}</option>)}
                     </select>
                 </div>
 
                 {/* تاريخ الإنجاز - يظهر فقط للبطاقات المكتملة */}
                 {formData.status === 'Completed' && (
-                    <div><label htmlFor="dateCompleted" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('dateCompleted')}</label>
-                        <input type="datetime-local" name="dateCompleted" id="dateCompleted" value={formData.dateCompleted ? new Date(formData.dateCompleted).toISOString().slice(0, 16) : ''} onChange={handleInputChange} className={commonInputStyle} />
+                    <div><label htmlFor="dateCompleted" className={getLabelStyle(language)}>{getLabel('dateCompleted')}</label>
+                        <input type="datetime-local" name="dateCompleted" id="dateCompleted" value={formData.dateCompleted ? new Date(formData.dateCompleted).toISOString().slice(0, 16) : ''} onChange={handleInputChange} className={getCommonInputStyle(language)} />
                     </div>
                 )}
             </div>
              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                <label className={`${getLabelStyle(language)} mb-3`}>
                     {getLabel('assignedTechnicians')}
                 </label>
 
@@ -650,7 +665,7 @@ const MaintenanceCardsPage: React.FC = () => {
                     </div>
                 )}
             </div>
-             <div><label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('tasks')}</label>
+             <div><label className={getLabelStyle(language)}>{getLabel('tasks')}</label>
                 <div className="space-y-2 mt-1 max-h-40 overflow-y-auto scrollbar-thin">
                     {currentTasks.map(task => (
                         <div key={task.id} className="flex items-center justify-between bg-gray-50 dark:bg-secondary-600 p-2 rounded-md">
@@ -665,12 +680,12 @@ const MaintenanceCardsPage: React.FC = () => {
                     ))}
                 </div>
                 <div className="mt-2 flex gap-2">
-                    <input type="text" value={newTaskDesc} onChange={e => setNewTaskDesc(e.target.value)} placeholder={getLabel('taskDescription')} className={`${commonInputStyle} flex-grow`} />
+                    <input type="text" value={newTaskDesc} onChange={e => setNewTaskDesc(e.target.value)} placeholder={getLabel('taskDescription')} className={`${getCommonInputStyle(language)} flex-grow`} />
                     <Button type="button" variant="secondary" onClick={handleAddTask} size="md">{getLabel('addTask')}</Button>
                 </div>
             </div>
-             <div><label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('notes')}</label>
-                <textarea name="notes" id="notes" value={formData.notes || ''} onChange={handleInputChange} rows={2} className={commonInputStyle}></textarea>
+             <div><label htmlFor="notes" className={getLabelStyle(language)}>{getLabel('notes')}</label>
+                <textarea name="notes" id="notes" value={formData.notes || ''} onChange={handleInputChange} rows={2} className={getCommonInputStyle(language)}></textarea>
             </div>
           <div className="pt-4 flex justify-end space-x-3 rtl:space-x-reverse border-t dark:border-secondary-600">
             <Button type="button" variant="secondary" onClick={closeModal}>{getLabel('cancel')}</Button>
