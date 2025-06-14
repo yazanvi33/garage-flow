@@ -8,6 +8,7 @@ import { AppContext } from '../context/AppContext';
 import Table from '../components/Table';
 import Modal from '../components/Modal';
 import Button from '../components/Button';
+import ColumnToggleButton from '../components/ColumnToggleButton';
 
 const PurchaseInvoicesPage: React.FC = () => {
   const context = useContext(AppContext);
@@ -23,6 +24,7 @@ const PurchaseInvoicesPage: React.FC = () => {
   const [partToView, setPartToView] = useState<SparePart | null>(null);
   const [isPartDetailModalOpen, setIsPartDetailModalOpen] = useState(false);
   const [sortConfig, setSortConfig] = useState<{ key: string | null; direction: 'ascending' | 'descending' | null }>({ key: null, direction: null });
+  const [visibleColumns, setVisibleColumns] = useState<string[]>([]);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -302,16 +304,37 @@ const PurchaseInvoicesPage: React.FC = () => {
   }, [filteredInvoices, sortConfig]);
 
   // Table columns
-  const columns = [
-    { header: 'internalId', accessor: 'internalId', sortable: true },
-    { header: 'supplierInvoiceNumber', accessor: 'invoiceNumber', sortable: true },
+  const allColumns = useMemo(() => [
+    { header: 'internalId', accessor: 'internalId' as keyof PurchaseInvoice, sortable: true },
+    { header: 'supplierInvoiceNumber', accessor: 'invoiceNumber' as keyof PurchaseInvoice, sortable: true },
     { header: 'invoiceDate', accessor: (item: PurchaseInvoice) => new Date(item.invoiceDate).toLocaleDateString(language), sortable: true, sortKey: 'invoiceDate' },
     { header: 'supplier', accessor: (item: PurchaseInvoice) => suppliersMap[item.supplierId]?.name || '-', sortable: false },
     { header: 'totalAfterDiscount', accessor: (item: PurchaseInvoice) => item.totalAfterDiscount.toFixed(2), sortable: true },
     { header: 'amountPaid', accessor: (item: PurchaseInvoice) => item.amountPaid.toFixed(2), sortable: true },
     {
+      header: 'paymentStatus',
+      accessor: (item: PurchaseInvoice) => {
+        const remaining = item.totalAfterDiscount - item.amountPaid;
+        let statusText = '';
+        let statusClass = '';
+
+        if (remaining <= 0) {
+          statusText = getLabel('paid');
+          statusClass = 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+        } else if (item.amountPaid > 0 && remaining > 0) {
+          statusText = getLabel('partiallyPaid');
+          statusClass = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+        } else {
+          statusText = getLabel('unpaid');
+          statusClass = 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+        }
+        return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusClass}`}>{statusText}</span>;
+      },
+      sortable: false
+    },
+    {
       header: 'actions',
-      accessor: 'id',
+      accessor: 'id' as keyof PurchaseInvoice,
       render: (invoice: PurchaseInvoice) => (
         <div className="flex space-x-1 rtl:space-x-reverse">
           <Button variant="outline" size="sm" onClick={() => openViewModal(invoice)} aria-label={getLabel('view')}><EyeIcon className="h-4 w-4" /></Button>
@@ -320,29 +343,55 @@ const PurchaseInvoicesPage: React.FC = () => {
         </div>
       ),
     },
-  ];
+  ], [language, suppliersMap, getLabel]);
+
+  // Initialize visible columns to all columns on first render
+  React.useEffect(() => {
+    if (allColumns.length > 0 && visibleColumns.length === 0) {
+      setVisibleColumns(allColumns.map(col => col.header));
+    }
+  }, [allColumns, visibleColumns.length]);
+
+  const toggleColumnVisibility = (columnKey: string) => {
+    setVisibleColumns(prev =>
+      prev.includes(columnKey)
+        ? prev.filter(key => key !== columnKey)
+        : [...prev, columnKey]
+    );
+  };
+
+  const columnsToShow = useMemo(() => {
+    return allColumns.filter(col => visibleColumns.includes(col.header));
+  }, [allColumns, visibleColumns]);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
         <h1 className="text-3xl font-semibold text-gray-800 dark:text-white">{getLabel('purchaseInvoices')}</h1>
-        <Button onClick={openModalForCreate} leftIcon={PlusIcon}>{getLabel('addNewPurchaseInvoice')}</Button>
+        <div className="flex items-center gap-2">
+          <ColumnToggleButton
+            allColumns={allColumns.map(col => ({ key: col.header, label: getLabel(col.header) || col.header }))}
+            visibleColumns={visibleColumns}
+            onToggleColumn={toggleColumnVisibility}
+          />
+          <Button onClick={openModalForCreate} leftIcon={PlusIcon}>{getLabel('addNewPurchaseInvoice')}</Button>
+        </div>
       </div>
       
-      <input 
-        type="text" 
-        placeholder={`${getLabel('search')}...`} 
-        value={searchTerm} 
-        onChange={(e) => setSearchTerm(e.target.value)} 
-        className={commonInputStyle} 
+      <input
+        type="text"
+        placeholder={`${getLabel('search')}...`}
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className={commonInputStyle}
       />
       
-      <Table 
-        columns={columns} 
-        data={sortedInvoices} 
-        keyExtractor={(invoice) => invoice.id} 
-        sortConfig={sortConfig} 
-        onSort={setSortConfig} 
+      <Table
+        columns={columnsToShow}
+        data={sortedInvoices}
+        keyExtractor={(invoice) => invoice.id}
+        sortConfig={sortConfig}
+        onSort={setSortConfig}
       />
 
       {/* Create/Edit Modal */}

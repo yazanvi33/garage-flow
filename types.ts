@@ -171,7 +171,7 @@ export interface Invoice {
   totalAmount: number;
   amountPaid: number;
   amountDue: number;
-  paymentStatus: 'Paid' | 'Partially Paid' | 'Unpaid' | 'Overdue';
+  paymentStatus: 'paid' | 'partiallyPaid' | 'unpaid' | 'overdue';
   notes?: string;
   // For customer invoices, list of source documents
   linkedInventoryIssueRequestIds?: string[];
