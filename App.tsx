@@ -14,6 +14,7 @@ import OutgoingInvoicesPage from './pages/OutgoingInvoicesPage';
 import PurchaseInvoicesPage from './pages/PurchaseInvoicesPage';
 import ReturnInvoicesPage from './pages/ReturnInvoicesPage';
 import ExternalTechniciansPage from './pages/ExternalTechniciansPage';
+import ExternalTechniciansManagementPage from './pages/ExternalTechniciansManagementPage';
 import WorkshopEquipmentPage from './pages/WorkshopEquipmentPage';
 import GeneralExpensesPage from './pages/GeneralExpensesPage';
 import LoginPage from './pages/LoginPage';
@@ -153,6 +154,7 @@ const App: React.FC = () => {
             <Route path="invoices/general" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.ACCOUNTANT]}><GeneralExpensesPage /></ProtectedRoute>} />
 
             <Route path="employees" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><EmployeesPage /></ProtectedRoute>} />
+            <Route path="external-technicians-management" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><ExternalTechniciansManagementPage /></ProtectedRoute>} />
             <Route path="reports" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.ACCOUNTANT]}><ReportsPage /></ProtectedRoute>} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

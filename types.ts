@@ -103,13 +103,24 @@ export interface Supplier {
 
 export interface Employee {
   id: string;
-  internalId: string; 
+  internalId: string;
   name: string;
-  role: 'Technician' | 'Accountant' | 'Service Advisor' | 'Manager'; 
+  role: 'Technician' | 'Accountant' | 'Service Advisor' | 'Manager';
   phone: string;
   email?: string;
   hireDate: string;
   salary?: number;
+}
+
+export interface ExternalTechnician {
+  id: string;
+  internalId: string;
+  name: string;
+  phone: string;
+  email?: string;
+  address?: string;
+  specialization: 'mechanic' | 'electrical' | 'bodywork' | 'painting' | 'tires' | 'ac';
+  notes?: string;
 }
 
 export interface MaintenanceTask {

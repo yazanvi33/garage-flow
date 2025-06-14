@@ -1,4 +1,4 @@
-import { User, UserRole, Customer, Vehicle, SparePart, Supplier, Employee, MaintenanceCard, Invoice, InvoiceType, WorkshopStats, Currency, FuelLevel, InventoryMovement, InventoryIssueRequest, InventoryIssueRequestStatus, ReplacedPartCondition, SecondaryWarehouseItem, InventoryIssueRequestItem, ReplacedPartEntry, PurchaseInvoice } from './types';
+import { User, UserRole, Customer, Vehicle, SparePart, Supplier, Employee, MaintenanceCard, Invoice, InvoiceType, WorkshopStats, Currency, FuelLevel, InventoryMovement, InventoryIssueRequest, InventoryIssueRequestStatus, ReplacedPartCondition, SecondaryWarehouseItem, InventoryIssueRequestItem, ReplacedPartEntry, PurchaseInvoice, ExternalTechnician } from './types';
 import { HomeIcon, UsersIcon, TruckIcon, WrenchScrewdriverIcon, ShoppingCartIcon, BriefcaseIcon, DocumentTextIcon, CogIcon, ArrowLeftOnRectangleIcon, ChartBarIcon, SunIcon, MoonIcon, LanguageIcon, AdjustmentsHorizontalIcon, CalendarDaysIcon, ArchiveBoxIcon, ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
 
 
@@ -58,6 +58,7 @@ export const NAVIGATION_ITEMS: NavItem[] = [
   },
   // Expenses section removed as items are moved under Invoicing or handled as Invoice types.
   { id: 'employees', label_en: 'Employees', label_ar: 'الموظفين', path: '/employees', icon: BriefcaseIcon, roles: [UserRole.ADMIN] },
+  { id: 'external-technicians-management', label_en: 'External Technicians', label_ar: 'الفنيين الخارجيين', path: '/external-technicians-management', icon: WrenchScrewdriverIcon, roles: [UserRole.ADMIN] },
   { id: 'reports', label_en: 'Reports', label_ar: 'التقارير', path: '/reports', icon: ChartBarIcon, roles: [UserRole.ADMIN, UserRole.ACCOUNTANT] },
 ];
 
@@ -157,6 +158,15 @@ export const MOCK_EMPLOYEES: Employee[] = [
     { id: 'emp-005', internalId: 'EMP-0005', name: 'محمد العلي', role: 'Technician', phone: '0566666666', hireDate: '2023-06-01', salary: 5800 },
     { id: 'emp-006', internalId: 'EMP-0006', name: 'Omar Hassan', role: 'Technician', phone: '0577777777', hireDate: '2022-09-10', salary: 6200 },
     { id: 'emp-007', internalId: 'EMP-0007', name: 'فيصل الأحمد', role: 'Technician', phone: '0588888888', hireDate: '2023-01-20', salary: 5700 }
+];
+
+export const MOCK_EXTERNAL_TECHNICIANS: ExternalTechnician[] = [
+    { id: 'ext-tech-001', internalId: 'ET-0001', name: 'ماهر الجيربوكس', phone: '0599999999', email: 'maher.gearbox@email.com', address: 'شارع الصناعة، دمشق', specialization: 'mechanic', notes: 'خبير في إصلاح الجيربوكس والمحركات' },
+    { id: 'ext-tech-002', internalId: 'ET-0002', name: 'أحمد الكهربائي', phone: '0588888888', email: 'ahmed.electric@email.com', address: 'حي الميدان، دمشق', specialization: 'electrical', notes: 'متخصص في الأنظمة الكهربائية والإلكترونية' },
+    { id: 'ext-tech-003', internalId: 'ET-0003', name: 'خالد الحداد', phone: '0577777777', address: 'منطقة الصناعية، حلب', specialization: 'bodywork', notes: 'خبير في إصلاح هياكل السيارات والحدادة' },
+    { id: 'ext-tech-004', internalId: 'ET-0004', name: 'محمد الدهان', phone: '0566666666', email: 'mohammed.painter@email.com', address: 'شارع النصر، حمص', specialization: 'painting', notes: 'متخصص في دهان السيارات والتشطيبات' },
+    { id: 'ext-tech-005', internalId: 'ET-0005', name: 'علي الإطارات', phone: '0555555555', address: 'السوق التجاري، اللاذقية', specialization: 'tires', notes: 'خبير في إطارات السيارات والعجلات' },
+    { id: 'ext-tech-006', internalId: 'ET-0006', name: 'سامر التكييف', phone: '0544444444', email: 'samer.ac@email.com', address: 'حي الزهراء، دمشق', specialization: 'ac', notes: 'متخصص في أنظمة التكييف والتبريد' }
 ];
 
 export const MOCK_MAINTENANCE_CARDS: MaintenanceCard[] = [
@@ -1021,5 +1031,38 @@ export const LABELS: Record<string, Record<string, string>> = {
     dateAdded: "تاريخ الإضافة",
     derivedFrom: "مشتق من",
     allConditions: "جميع الحالات",
+    // External Technicians page specific labels
+    externalTechnicianInvoices: "فواتير الفنيين الخارجيين",
+    addNewExternalTechnicianInvoice: "إضافة فاتورة فني خارجي جديدة",
+    editExternalTechnicianInvoice: "تعديل فاتورة الفني الخارجي",
+    externalTechnicianName: "اسم الفني الخارجي",
+    dateIssued: "تاريخ الإصدار",
+    invoiceItems: "بنود الفاتورة",
+    unitPrice: "سعر الوحدة",
+    subTotal: "المجموع الفرعي",
+    discountAmount: "مبلغ الخصم",
+    amountPaid: "المبلغ المدفوع",
+    amountDue: "المبلغ المستحق",
+    paymentStatus: "حالة الدفع",
+    unknownVehicle: "سيارة غير معروفة",
+    // External Technicians management labels
+    addNewExternalTechnician: "إضافة فني خارجي جديد",
+    editExternalTechnician: "تعديل الفني الخارجي",
+    technicianName: "اسم الفني",
+    specialization: "التخصص",
+    mechanicSpecialization: "فني ميكانيك",
+    electricalSpecialization: "فني كهرباء",
+    bodyworkSpecialization: "فني حدادة",
+    paintingSpecialization: "فني دهان",
+    tiresSpecialization: "فني إطارات",
+    acSpecialization: "فني تكييف",
+    selectSpecialization: "اختر التخصص",
+    searchOrSelectTechnician: "ابحث أو اختر الفني",
+    // Additional labels
+    invoiceDetails: "تفاصيل الفاتورة",
+    invoiceTotals: "إجماليات الفاتورة",
+    confirmDelete: "هل أنت متأكد من الحذف؟",
+    serviceDescriptionPlaceholder: "وصف الخدمة أو العمل",
+    addItem: "إضافة بند",
   }
 };

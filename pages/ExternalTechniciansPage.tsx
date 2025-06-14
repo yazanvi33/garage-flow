@@ -1,9 +1,9 @@
-import React, { useState, useMemo, useContext, useEffect } from 'react';
+import React, { useState, useMemo, useContext, useEffect, Fragment } from 'react';
 import { createPortal } from 'react-dom';
-import { PlusIcon, EyeIcon, PencilIcon, TrashIcon, ChevronUpDownIcon, CheckIcon } from '@heroicons/react/24/outline';
-import { Combobox } from '@headlessui/react';
-import { Invoice, InvoiceItem, MaintenanceCard, Vehicle, Employee, InvoiceType } from '../types';
-import { MOCK_INVOICES, MOCK_MAINTENANCE_CARDS, MOCK_VEHICLES, MOCK_EMPLOYEES } from '../constants';
+import { PlusIcon, EyeIcon, PencilIcon, TrashIcon, ChevronUpDownIcon, CheckIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
+import { Combobox, Transition } from '@headlessui/react';
+import { Invoice, InvoiceItem, MaintenanceCard, Vehicle, Employee, InvoiceType, ExternalTechnician, Customer } from '../types';
+import { MOCK_INVOICES, MOCK_MAINTENANCE_CARDS, MOCK_VEHICLES, MOCK_EMPLOYEES, MOCK_EXTERNAL_TECHNICIANS, MOCK_CUSTOMERS } from '../constants';
 import { AppContext } from '../context/AppContext';
 import Table from '../components/Table';
 import Modal from '../components/Modal';
@@ -48,14 +48,33 @@ const ExternalTechniciansPage: React.FC = () => {
   // Combobox states
   const [maintenanceCardQuery, setMaintenanceCardQuery] = useState('');
   const [selectedMaintenanceCard, setSelectedMaintenanceCard] = useState<MaintenanceCard | null>(null);
+  const [technicianQuery, setTechnicianQuery] = useState('');
+  const [selectedTechnician, setSelectedTechnician] = useState<ExternalTechnician | null>(null);
 
   // Data maps
   const maintenanceCardsMap = useMemo(() => MOCK_MAINTENANCE_CARDS.reduce((map, mc) => { map[mc.id] = mc; return map; }, {} as Record<string, MaintenanceCard>), []);
   const vehiclesMap = useMemo(() => MOCK_VEHICLES.reduce((map, v) => { map[v.id] = v; return map; }, {} as Record<string, Vehicle>), []);
   const employeesMap = useMemo(() => MOCK_EMPLOYEES.reduce((map, e) => { map[e.id] = e; return map; }, {} as Record<string, Employee>), []);
+  const customersMap = useMemo(() => MOCK_CUSTOMERS.reduce((map, c) => { map[c.id] = c; return map; }, {} as Record<string, Customer>), []);
 
-  // Common styles
-  const commonInputStyle = "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-secondary-700 dark:text-white sm:text-sm py-2 px-3";
+  // Common styles with RTL support
+  const getCommonInputStyle = (language: string) => {
+    const baseStyle = "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-secondary-700 dark:text-white sm:text-sm py-2 px-3";
+    const rtlStyle = language === 'ar' ? 'text-right' : 'text-left';
+    return `${baseStyle} ${rtlStyle}`;
+  };
+
+  const getLabelStyle = (language: string) => {
+    const baseStyle = "block text-sm font-medium text-gray-700 dark:text-gray-300";
+    const rtlStyle = language === 'ar' ? 'text-right' : 'text-left';
+    return `${baseStyle} ${rtlStyle}`;
+  };
+
+  const getComboboxInputStyle = (language: string) => {
+    const baseStyle = "w-full py-2 ps-3 pe-10 text-sm leading-5 text-gray-900 dark:text-white border border-gray-300 dark:border-secondary-600 rounded-md focus:ring-primary-500 focus:border-primary-500 dark:bg-secondary-700";
+    const rtlStyle = language === 'ar' ? 'text-right' : 'text-left';
+    return `${baseStyle} ${rtlStyle}`;
+  };
 
   // Filtered data for comboboxes
   const filteredMaintenanceCards = useMemo(() => {
@@ -66,6 +85,16 @@ const ExternalTechniciansPage: React.FC = () => {
           vehiclesMap[mc.vehicleId]?.licensePlate.toLowerCase().includes(maintenanceCardQuery.toLowerCase())
         );
   }, [maintenanceCardQuery, vehiclesMap]);
+
+  const filteredTechnicians = useMemo(() => {
+    return technicianQuery === ''
+      ? MOCK_EXTERNAL_TECHNICIANS
+      : MOCK_EXTERNAL_TECHNICIANS.filter(tech =>
+          tech.name.toLowerCase().includes(technicianQuery.toLowerCase()) ||
+          tech.internalId.toLowerCase().includes(technicianQuery.toLowerCase()) ||
+          getLabel(tech.specialization + 'Specialization').toLowerCase().includes(technicianQuery.toLowerCase())
+        );
+  }, [technicianQuery, getLabel]);
 
   // Calculate totals
   const calculateTotals = () => {
@@ -152,6 +181,8 @@ const ExternalTechniciansPage: React.FC = () => {
     setCurrentItems([]);
     setSelectedMaintenanceCard(null);
     setMaintenanceCardQuery('');
+    setSelectedTechnician(null);
+    setTechnicianQuery('');
     setIsModalOpen(true);
   };
 
@@ -172,6 +203,11 @@ const ExternalTechniciansPage: React.FC = () => {
     const mc = invoice.maintenanceCardId ? maintenanceCardsMap[invoice.maintenanceCardId] : null;
     setSelectedMaintenanceCard(mc);
     setMaintenanceCardQuery(mc?.internalId || '');
+
+    // Find technician by name
+    const tech = MOCK_EXTERNAL_TECHNICIANS.find(t => t.name === invoice.externalTechnicianName);
+    setSelectedTechnician(tech || null);
+    setTechnicianQuery(tech?.name || invoice.externalTechnicianName || '');
     setIsModalOpen(true);
   };
 
@@ -206,7 +242,7 @@ const ExternalTechniciansPage: React.FC = () => {
       id: editingInvoice ? editingInvoice.id : `eti-${Date.now()}`,
       invoiceNumber: formData.invoiceNumber,
       type: InvoiceType.EXTERNAL_TECHNICIAN,
-      externalTechnicianName: formData.externalTechnicianName,
+      externalTechnicianName: selectedTechnician?.name || formData.externalTechnicianName,
       maintenanceCardId: selectedMaintenanceCard?.id,
       dateIssued: formData.dateIssued,
       items: currentItems,
@@ -340,12 +376,12 @@ const ExternalTechniciansPage: React.FC = () => {
         </div>
       </div>
       
-      <input 
-        type="text" 
-        placeholder={`${getLabel('search')}...`} 
-        value={searchTerm} 
-        onChange={(e) => setSearchTerm(e.target.value)} 
-        className={commonInputStyle} 
+      <input
+        type="text"
+        placeholder={`${getLabel('search')}...`}
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className={getCommonInputStyle(language)}
       />
       
       <Table 
@@ -362,51 +398,47 @@ const ExternalTechniciansPage: React.FC = () => {
           {/* Invoice Header */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label htmlFor="invoiceNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('invoiceNumber')}</label>
-              <input type="text" name="invoiceNumber" id="invoiceNumber" value={formData.invoiceNumber} onChange={handleInputChange} required className={commonInputStyle} />
+              <label htmlFor="invoiceNumber" className={getLabelStyle(language)}>{getLabel('invoiceNumber')}</label>
+              <input type="text" name="invoiceNumber" id="invoiceNumber" value={formData.invoiceNumber} onChange={handleInputChange} required className={getCommonInputStyle(language)} />
             </div>
             <div>
-              <label htmlFor="externalTechnicianName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('externalTechnicianName')}</label>
-              <input type="text" name="externalTechnicianName" id="externalTechnicianName" value={formData.externalTechnicianName} onChange={handleInputChange} required className={commonInputStyle} />
-            </div>
-            <div>
-              <label htmlFor="dateIssued" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('dateIssued')}</label>
-              <input type="date" name="dateIssued" id="dateIssued" value={formData.dateIssued} onChange={handleInputChange} required className={commonInputStyle} />
-            </div>
-          </div>
-
-          {/* Maintenance Card Link */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="maintenance-card-combobox" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('maintenanceCard')}</label>
-              <Combobox value={selectedMaintenanceCard} onChange={(mc) => {
-                setSelectedMaintenanceCard(mc);
-                setFormData(prev => ({ ...prev, maintenanceCardId: mc?.id || '' }));
+              <label htmlFor="externalTechnicianName" className={getLabelStyle(language)}>{getLabel('externalTechnicianName')}</label>
+              <Combobox value={selectedTechnician} onChange={(tech) => {
+                setSelectedTechnician(tech);
+                setFormData(prev => ({ ...prev, externalTechnicianName: tech?.name || '' }));
+                setTechnicianQuery(tech?.name || '');
               }}>
                 <div className="relative mt-1">
                   <Combobox.Input
-                    id="maintenance-card-combobox"
-                    name="maintenanceCard"
-                    className={commonInputStyle}
-                    displayValue={(mc: MaintenanceCard) => mc?.internalId || ''}
-                    onChange={(event) => setMaintenanceCardQuery(event.target.value)}
-                    placeholder={getLabel('selectMaintenanceCardOptional') || 'اختر بطاقة صيانة (اختياري)'}
+                    id="externalTechnicianName"
+                    name="externalTechnicianName"
+                    className={getComboboxInputStyle(language)}
+                    displayValue={(tech: ExternalTechnician) => tech?.name || technicianQuery}
+                    onChange={(event) => {
+                      setTechnicianQuery(event.target.value);
+                      setFormData(prev => ({ ...prev, externalTechnicianName: event.target.value }));
+                    }}
+                    placeholder={getLabel('searchOrSelectTechnician')}
+                    required
                   />
                   <Combobox.Button className="absolute inset-y-0 end-0 flex items-center pe-3 rtl:ps-3 rtl:inset-y-0 rtl:start-0 rtl:end-auto">
                     <ChevronUpDownIcon className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" aria-hidden="true" />
                   </Combobox.Button>
                   <Combobox.Options className={`absolute mt-1 max-h-60 w-full overflow-auto scrollbar-thin rounded-md bg-white dark:bg-secondary-700 py-1 text-base shadow-lg ring-1 ring-black/5 dark:ring-white/10 focus:outline-none sm:text-sm z-50 ${language === 'ar' ? 'right-0 left-auto' : 'left-0 right-auto'}`}>
-                    {filteredMaintenanceCards.map((mc) => (
+                    {filteredTechnicians.map((tech) => (
                       <Combobox.Option
-                        key={mc.id}
-                        value={mc}
+                        key={tech.id}
+                        value={tech}
                         className={({ active }) => `relative cursor-default select-none py-2 ${language === 'ar' ? 'text-right ps-4 pe-10' : 'text-left ps-10 pe-4'} ${active ? 'bg-primary-600 text-white' : 'text-gray-900 dark:text-white'}`}
                       >
                         {({ selected, active }) => (
                           <>
-                            <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
-                              {mc.internalId} - {vehiclesMap[mc.vehicleId]?.licensePlate || getLabel('unknownVehicle')}
-                            </span>
+                            <div className={`block ${selected ? 'font-medium' : 'font-normal'}`}>
+                              <div className="font-medium">{tech.name}</div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400">
+                                {tech.internalId} - {getLabel(tech.specialization + 'Specialization')} - {tech.phone}
+                              </div>
+                            </div>
                             {selected ? (
                               <span className={`absolute inset-y-0 ${language === 'ar' ? 'left-0 pl-3' : 'left-0 pl-3'} flex items-center ${active ? 'text-white' : 'text-primary-600'}`}>
                                 <CheckIcon className="h-5 w-5" aria-hidden="true" />
@@ -420,17 +452,77 @@ const ExternalTechniciansPage: React.FC = () => {
                 </div>
               </Combobox>
             </div>
-            {selectedMaintenanceCard && vehiclesMap[selectedMaintenanceCard.vehicleId] && (
-              <div className="bg-gray-50 dark:bg-secondary-700 p-3 rounded-md">
-                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{getLabel('vehicleInformation')}</h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
-                  {getLabel('make')}: {vehiclesMap[selectedMaintenanceCard.vehicleId]?.make} - 
-                  {getLabel('model')}: {vehiclesMap[selectedMaintenanceCard.vehicleId]?.model} - 
-                  {getLabel('licensePlate')}: {vehiclesMap[selectedMaintenanceCard.vehicleId]?.licensePlate}
-                </p>
-              </div>
-            )}
+            <div>
+              <label htmlFor="dateIssued" className={getLabelStyle(language)}>{getLabel('dateIssued')}</label>
+              <input type="date" name="dateIssued" id="dateIssued" value={formData.dateIssued} onChange={handleInputChange} required className={getCommonInputStyle(language)} />
+            </div>
           </div>
+
+          {/* Maintenance Card Link */}
+          <div>
+            <label htmlFor="maintenanceCardCombobox" className={getLabelStyle(language)}>{getLabel('maintenanceCard')}</label>
+            <Combobox value={selectedMaintenanceCard} onChange={(mc: MaintenanceCard | null) => {
+              setSelectedMaintenanceCard(mc);
+              setFormData(prev => ({ ...prev, maintenanceCardId: mc ? mc.id : '' }));
+              if(!mc) setMaintenanceCardQuery('');
+            }}>
+              <div className="relative mt-1">
+                <Combobox.Input
+                  id="maintenanceCardCombobox"
+                  className={getComboboxInputStyle(language)}
+                  displayValue={(mc: MaintenanceCard) => mc?.internalId || ''}
+                  onChange={(event) => setMaintenanceCardQuery(event.target.value)}
+                  placeholder={getLabel('selectMaintenanceCardOptional') || 'اختر بطاقة صيانة (اختياري)'}
+                />
+                <Combobox.Button className="absolute inset-y-0 end-0 flex items-center pe-3 rtl:ps-3 rtl:inset-y-0 rtl:start-0 rtl:end-auto">
+                  <ChevronUpDownIcon className="h-4 w-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" aria-hidden="true" />
+                </Combobox.Button>
+              </div>
+              <Transition as={Fragment} leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0" afterLeave={() => setMaintenanceCardQuery('')}>
+                <Combobox.Options className={`absolute mt-1 max-h-60 w-80 sm:w-96 overflow-auto scrollbar-thin rounded-md bg-white dark:bg-secondary-700 py-1 text-base shadow-lg ring-1 ring-black/5 dark:ring-white/10 focus:outline-none sm:text-sm z-50 ${language === 'ar' ? 'right-6' : 'left-0'}`}>
+                  {filteredMaintenanceCards.length === 0 && maintenanceCardQuery !== '' ? (
+                    <div className="relative cursor-default select-none px-4 py-2 text-gray-700 dark:text-gray-300">{getLabel('noDataFound')}</div>
+                  ) : (
+                    filteredMaintenanceCards.map((mc) => (
+                      <Combobox.Option key={mc.id} value={mc} className={({ active }) => `relative cursor-default select-none py-2 ps-10 pe-4 ${language === 'ar' ? 'text-right ps-4 pe-10' : 'text-left ps-10 pe-4'} ${active ? 'bg-primary-600 text-white' : 'text-gray-900 dark:text-white'}`}>
+                        {({ selected }) => (
+                          <>
+                            <div className={`block ${selected ? 'font-medium' : 'font-normal'}`}>
+                              <div className="font-medium text-gray-900 dark:text-white truncate">
+                                {mc.internalId} - {vehiclesMap[mc.vehicleId]?.make} {vehiclesMap[mc.vehicleId]?.model}
+                              </div>
+                              <div className="text-sm text-gray-600 dark:text-gray-300 mt-1 truncate">
+                                {customersMap[mc.customerId]?.name}
+                              </div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                                {vehiclesMap[mc.vehicleId]?.licensePlate} • {new Date(mc.dateCreated).toLocaleDateString(language)}
+                              </div>
+                            </div>
+                            {selected ? <span className={`absolute inset-y-0 flex items-center ${language === 'ar' ? 'end-0 pe-3' : 'start-0 ps-3'} text-primary-600`}><CheckCircleIcon className="h-5 w-5"/></span> : null}
+                          </>
+                        )}
+                      </Combobox.Option>
+                    ))
+                  )}
+                </Combobox.Options>
+              </Transition>
+            </Combobox>
+          </div>
+
+          {formData.maintenanceCardId && selectedMaintenanceCard && (
+            <div className="mt-3 p-3 border rounded-md bg-gray-50 dark:bg-secondary-700 dark:border-secondary-600">
+              <h4 className="text-md font-semibold mb-1 text-gray-700 dark:text-gray-200">{getLabel('vehicleInformation')}</h4>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-1 text-sm">
+                <p><strong className="text-gray-700 dark:text-gray-300">{getLabel('vehicle')}:</strong> <span className="text-gray-900 dark:text-white">{vehiclesMap[selectedMaintenanceCard.vehicleId]?.make} {vehiclesMap[selectedMaintenanceCard.vehicleId]?.model}</span></p>
+                <p><strong className="text-gray-700 dark:text-gray-300">{getLabel('licensePlate')}:</strong> <span className="text-gray-900 dark:text-white">{vehiclesMap[selectedMaintenanceCard.vehicleId]?.licensePlate || '-'}</span></p>
+                <p><strong className="text-gray-700 dark:text-gray-300">{getLabel('vin')}:</strong> <span className="text-gray-900 dark:text-white">{vehiclesMap[selectedMaintenanceCard.vehicleId]?.vin || '-'}</span></p>
+                <p><strong className="text-gray-700 dark:text-gray-300">{getLabel('color')}:</strong> <span className="text-gray-900 dark:text-white">{vehiclesMap[selectedMaintenanceCard.vehicleId]?.color || '-'}</span></p>
+                <p><strong className="text-gray-700 dark:text-gray-300">{getLabel('year')}:</strong> <span className="text-gray-900 dark:text-white">{vehiclesMap[selectedMaintenanceCard.vehicleId]?.year || '-'}</span></p>
+                <p><strong className="text-gray-700 dark:text-gray-300">{getLabel('customer')}:</strong> <span className="text-gray-900 dark:text-white">{customersMap[selectedMaintenanceCard.customerId]?.name || '-'}</span></p>
+                <p><strong className="text-gray-700 dark:text-gray-300">{getLabel('odometerIn')}:</strong> <span className="text-gray-900 dark:text-white">{selectedMaintenanceCard.odometerIn || '-'}</span></p>
+              </div>
+            </div>
+          )}
 
           {/* Invoice Items */}
           <fieldset className="border p-4 rounded-md dark:border-gray-600">
@@ -438,20 +530,20 @@ const ExternalTechniciansPage: React.FC = () => {
 
             {/* Existing Items */}
             {currentItems.map((item, index) => (
-              <div key={item.id} className="grid grid-cols-12 gap-2 items-center mb-2 p-2 border-b dark:border-gray-700">
+              <div key={item.id} className="grid grid-cols-12 gap-2 items-start mb-2 p-2 border-b dark:border-gray-700">
                 <div className="col-span-6">
-                  <label htmlFor={`serviceDescription-${item.id}`} className="text-xs text-gray-700 dark:text-gray-300">{getLabel('description')}</label>
-                  <input
+                  <label htmlFor={`serviceDescription-${item.id}`} className={`text-xs ${language === 'ar' ? 'text-right' : 'text-left'} text-gray-700 dark:text-gray-300`}>{getLabel('description')}</label>
+                  <textarea
                     id={`serviceDescription-${item.id}`}
                     name={`serviceDescription-${item.id}`}
-                    type="text"
                     value={item.serviceDescription || ''}
                     onChange={e => handleItemChange(item.id, 'serviceDescription', e.target.value)}
-                    className={commonInputStyle}
+                    className={`${getCommonInputStyle(language)} resize-y min-h-[2.5rem]`}
+                    rows={2}
                   />
                 </div>
                 <div className="col-span-2">
-                  <label htmlFor={`quantity-${item.id}`} className="text-xs text-gray-700 dark:text-gray-300">{getLabel('quantity')}</label>
+                  <label htmlFor={`quantity-${item.id}`} className={`text-xs ${language === 'ar' ? 'text-right' : 'text-left'} text-gray-700 dark:text-gray-300`}>{getLabel('quantity')}</label>
                   <input
                     id={`quantity-${item.id}`}
                     name={`quantity-${item.id}`}
@@ -459,11 +551,11 @@ const ExternalTechniciansPage: React.FC = () => {
                     value={item.quantity}
                     onChange={e => handleItemChange(item.id, 'quantity', parseInt(e.target.value) || 0)}
                     min="1"
-                    className={commonInputStyle}
+                    className={getCommonInputStyle(language)}
                   />
                 </div>
                 <div className="col-span-2">
-                  <label htmlFor={`unitPrice-${item.id}`} className="text-xs text-gray-700 dark:text-gray-300">{getLabel('unitPrice')}</label>
+                  <label htmlFor={`unitPrice-${item.id}`} className={`text-xs ${language === 'ar' ? 'text-right' : 'text-left'} text-gray-700 dark:text-gray-300`}>{getLabel('unitPrice')}</label>
                   <input
                     id={`unitPrice-${item.id}`}
                     name={`unitPrice-${item.id}`}
@@ -472,10 +564,10 @@ const ExternalTechniciansPage: React.FC = () => {
                     onChange={e => handleItemChange(item.id, 'unitPrice', parseFloat(e.target.value) || 0)}
                     min="0"
                     step="0.01"
-                    className={commonInputStyle}
+                    className={getCommonInputStyle(language)}
                   />
                 </div>
-                <div className="col-span-2 flex items-end">
+                <div className="col-span-2 flex items-start pt-6">
                   <Button type="button" variant="danger" size="sm" onClick={() => removeItem(item.id)}>
                     <TrashIcon className="h-4 w-4" />
                   </Button>
@@ -484,21 +576,21 @@ const ExternalTechniciansPage: React.FC = () => {
             ))}
 
             {/* Add New Item */}
-            <div className="grid grid-cols-12 gap-2 items-end mt-4 p-2 border-t dark:border-gray-600">
+            <div className="grid grid-cols-12 gap-2 items-start mt-4 p-2 border-t dark:border-gray-600">
               <div className="col-span-6">
-                <label htmlFor="new-serviceDescription" className="text-xs text-gray-700 dark:text-gray-300">{getLabel('description')}</label>
-                <input
+                <label htmlFor="new-serviceDescription" className={`text-xs ${language === 'ar' ? 'text-right' : 'text-left'} text-gray-700 dark:text-gray-300`}>{getLabel('description')}</label>
+                <textarea
                   id="new-serviceDescription"
                   name="newServiceDescription"
-                  type="text"
                   value={newItem.serviceDescription}
                   onChange={e => setNewItem(prev => ({ ...prev, serviceDescription: e.target.value }))}
-                  className={commonInputStyle}
+                  className={`${getCommonInputStyle(language)} resize-y min-h-[2.5rem]`}
                   placeholder={getLabel('serviceDescriptionPlaceholder') || 'وصف الخدمة أو العمل'}
+                  rows={2}
                 />
               </div>
               <div className="col-span-2">
-                <label htmlFor="new-quantity" className="text-xs text-gray-700 dark:text-gray-300">{getLabel('quantity')}</label>
+                <label htmlFor="new-quantity" className={`text-xs ${language === 'ar' ? 'text-right' : 'text-left'} text-gray-700 dark:text-gray-300`}>{getLabel('quantity')}</label>
                 <input
                   id="new-quantity"
                   name="newQuantity"
@@ -506,11 +598,11 @@ const ExternalTechniciansPage: React.FC = () => {
                   value={newItem.quantity}
                   onChange={e => setNewItem(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
                   min="1"
-                  className={commonInputStyle}
+                  className={getCommonInputStyle(language)}
                 />
               </div>
               <div className="col-span-2">
-                <label htmlFor="new-unitPrice" className="text-xs text-gray-700 dark:text-gray-300">{getLabel('unitPrice')}</label>
+                <label htmlFor="new-unitPrice" className={`text-xs ${language === 'ar' ? 'text-right' : 'text-left'} text-gray-700 dark:text-gray-300`}>{getLabel('unitPrice')}</label>
                 <input
                   id="new-unitPrice"
                   name="newUnitPrice"
@@ -519,10 +611,10 @@ const ExternalTechniciansPage: React.FC = () => {
                   onChange={e => setNewItem(prev => ({ ...prev, unitPrice: parseFloat(e.target.value) || 0 }))}
                   min="0"
                   step="0.01"
-                  className={commonInputStyle}
+                  className={getCommonInputStyle(language)}
                 />
               </div>
-              <div className="col-span-2 flex items-end">
+              <div className="col-span-2 flex items-start pt-6">
                 <Button type="button" variant="secondary" onClick={addItem} leftIcon={PlusIcon}>{getLabel('addItem')}</Button>
               </div>
             </div>
@@ -532,40 +624,40 @@ const ExternalTechniciansPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-4">
               <div>
-                <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('notes')}</label>
-                <textarea name="notes" id="notes" value={formData.notes} onChange={handleInputChange} rows={3} className={commonInputStyle}></textarea>
+                <label htmlFor="notes" className={getLabelStyle(language)}>{getLabel('notes')}</label>
+                <textarea name="notes" id="notes" value={formData.notes} onChange={handleInputChange} rows={3} className={`${getCommonInputStyle(language)} resize-y`}></textarea>
               </div>
             </div>
             <div className="space-y-4">
               <div>
-                <label htmlFor="subTotal" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('subtotal')}</label>
+                <label htmlFor="subTotal" className={getLabelStyle(language)}>{getLabel('subTotal')}</label>
                 <input
                   id="subTotal"
                   name="subTotal"
                   type="text"
                   value={formData.subTotal.toFixed(2)}
                   readOnly
-                  className={`${commonInputStyle} bg-gray-100 dark:bg-secondary-600 text-gray-900 dark:text-white`}
+                  className={`${getCommonInputStyle(language)} bg-gray-100 dark:bg-secondary-600 text-gray-900 dark:text-white`}
                 />
               </div>
               <div>
-                <label htmlFor="discountAmount" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('discount')}</label>
-                <input type="number" name="discountAmount" id="discountAmount" value={formData.discountAmount} onChange={handleDiscountChange} min="0" step="0.01" className={commonInputStyle} />
+                <label htmlFor="discountAmount" className={getLabelStyle(language)}>{getLabel('discountAmount')}</label>
+                <input type="number" name="discountAmount" id="discountAmount" value={formData.discountAmount} onChange={handleDiscountChange} min="0" step="0.01" className={getCommonInputStyle(language)} />
               </div>
               <div>
-                <label htmlFor="totalAmount" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('totalAmount')}</label>
+                <label htmlFor="totalAmount" className={getLabelStyle(language)}>{getLabel('totalAmount')}</label>
                 <input
                   id="totalAmount"
                   name="totalAmount"
                   type="text"
                   value={formData.totalAmount.toFixed(2)}
                   readOnly
-                  className={`${commonInputStyle} bg-gray-100 dark:bg-secondary-600 text-gray-900 dark:text-white font-bold`}
+                  className={`${getCommonInputStyle(language)} bg-gray-100 dark:bg-secondary-600 text-gray-900 dark:text-white font-bold`}
                 />
               </div>
               <div>
-                <label htmlFor="amountPaid" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{getLabel('amountPaid')}</label>
-                <input type="number" name="amountPaid" id="amountPaid" value={formData.amountPaid} onChange={handleInputChange} min="0" step="0.01" className={commonInputStyle} />
+                <label htmlFor="amountPaid" className={getLabelStyle(language)}>{getLabel('amountPaid')}</label>
+                <input type="number" name="amountPaid" id="amountPaid" value={formData.amountPaid} onChange={handleInputChange} min="0" step="0.01" className={getCommonInputStyle(language)} />
               </div>
             </div>
           </div>
