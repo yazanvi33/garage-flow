@@ -110,7 +110,8 @@ const ExternalTechniciansPage: React.FC = () => {
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const numValue = ['amountPaid'].includes(name) ? parseFloat(value) || 0 : value;
+    setFormData(prev => ({ ...prev, [name]: numValue }));
   };
 
   // Handle discount change
@@ -307,12 +308,12 @@ const ExternalTechniciansPage: React.FC = () => {
     { header: 'externalTechnicianName', accessor: 'externalTechnicianName' as keyof Invoice, sortable: true },
     { header: 'maintenanceCard', accessor: (item: Invoice) => maintenanceCardsMap[item.maintenanceCardId || '']?.internalId || '-', sortable: false },
     { header: 'dateIssued', accessor: (item: Invoice) => new Date(item.dateIssued).toLocaleDateString(language), sortable: true, sortKey: 'dateIssued' },
-    { header: 'totalAmount', accessor: (item: Invoice) => item.totalAmount.toFixed(2), sortable: true },
-    { header: 'amountPaid', accessor: (item: Invoice) => item.amountPaid.toFixed(2), sortable: true },
+    { header: 'totalAmount', accessor: (item: Invoice) => (item.totalAmount || 0).toFixed(2), sortable: true },
+    { header: 'amountPaid', accessor: (item: Invoice) => (item.amountPaid || 0).toFixed(2), sortable: true },
     {
       header: 'paymentStatus',
       accessor: (item: Invoice) => {
-        const remaining = item.totalAmount - item.amountPaid;
+        const remaining = (item.totalAmount || 0) - (item.amountPaid || 0);
         let statusText = '';
         let statusClass = '';
 
@@ -745,15 +746,15 @@ const ExternalTechniciansPage: React.FC = () => {
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-dashed border-gray-200 dark:border-gray-700">
                   <dt className="font-medium text-gray-600 dark:text-gray-400">{getLabel('totalAmount')}:</dt>
-                  <dd className="text-gray-800 dark:text-gray-200 text-right rtl:text-left font-bold">{viewingInvoice.totalAmount.toFixed(2)}</dd>
+                  <dd className="text-gray-800 dark:text-gray-200 text-right rtl:text-left font-bold">{(viewingInvoice.totalAmount || 0).toFixed(2)}</dd>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-dashed border-gray-200 dark:border-gray-700">
                   <dt className="font-medium text-gray-600 dark:text-gray-400">{getLabel('amountPaid')}:</dt>
-                  <dd className="text-gray-800 dark:text-gray-200 text-right rtl:text-left">{viewingInvoice.amountPaid.toFixed(2)}</dd>
+                  <dd className="text-gray-800 dark:text-gray-200 text-right rtl:text-left">{(viewingInvoice.amountPaid || 0).toFixed(2)}</dd>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-dashed border-gray-200 dark:border-gray-700">
                   <dt className="font-medium text-gray-600 dark:text-gray-400">{getLabel('remainingBalance')}:</dt>
-                  <dd className="text-gray-800 dark:text-gray-200 text-right rtl:text-left font-bold text-red-600 dark:text-red-400">{(viewingInvoice.totalAmount - viewingInvoice.amountPaid).toFixed(2)}</dd>
+                  <dd className="text-gray-800 dark:text-gray-200 text-right rtl:text-left font-bold text-red-600 dark:text-red-400">{((viewingInvoice.totalAmount || 0) - (viewingInvoice.amountPaid || 0)).toFixed(2)}</dd>
                 </div>
               </dl>
             </div>

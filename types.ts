@@ -121,6 +121,11 @@ export interface ExternalTechnician {
   address?: string;
   specialization: 'mechanic' | 'electrical' | 'bodywork' | 'painting' | 'tires' | 'ac';
   notes?: string;
+  openingBalance?: number; // رصيد أول المدة
+  // الحقول المحسوبة - لا تُدخل يدوياً
+  totalInvoiced?: number; // إجمالي الفواتير
+  totalPaid?: number; // إجمالي المدفوع
+  remainingBalance?: number; // الرصيد المتبقي (openingBalance + totalInvoiced - totalPaid)
 }
 
 export interface MaintenanceTask {
