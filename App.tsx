@@ -46,6 +46,10 @@ const App: React.FC = () => {
     const storedCurrencyCode = localStorage.getItem('currencyCode');
     return CURRENCY_OPTIONS.find(c => c.code === storedCurrencyCode) || DEFAULT_CURRENCY;
   });
+  const [sidebarCollapsed, setSidebarCollapsedState] = useState<boolean>(() => {
+    const storedCollapsed = localStorage.getItem('sidebarCollapsed');
+    return storedCollapsed === 'true';
+  });
 
   const setCurrentUser = useCallback((user: User | null) => {
     setCurrentUserState(user);
@@ -96,6 +100,11 @@ const App: React.FC = () => {
     setCurrencyState(newCurrency);
   }, []);
 
+  const setSidebarCollapsed = useCallback((collapsed: boolean) => {
+    setSidebarCollapsedState(collapsed);
+    localStorage.setItem('sidebarCollapsed', collapsed.toString());
+  }, []);
+
   const appContextValue: AppContextType = useMemo(() => ({
     theme,
     setTheme,
@@ -108,7 +117,9 @@ const App: React.FC = () => {
     setDateRange,
     currency,
     setCurrency,
-  }), [theme, setTheme, language, setLanguage, currentUser, setCurrentUser, getLabel, dateRange, setDateRange, currency, setCurrency]);
+    sidebarCollapsed,
+    setSidebarCollapsed,
+  }), [theme, setTheme, language, setLanguage, currentUser, setCurrentUser, getLabel, dateRange, setDateRange, currency, setCurrency, sidebarCollapsed, setSidebarCollapsed]);
 
   const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles }) => {
     const location = useLocation();

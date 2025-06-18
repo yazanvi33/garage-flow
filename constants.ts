@@ -1,9 +1,9 @@
 import { User, UserRole, Customer, Vehicle, SparePart, Supplier, Employee, MaintenanceCard, Invoice, InvoiceType, WorkshopStats, Currency, FuelLevel, InventoryMovement, InventoryIssueRequest, InventoryIssueRequestStatus, ReplacedPartCondition, SecondaryWarehouseItem, InventoryIssueRequestItem, ReplacedPartEntry, PurchaseInvoice, ExternalTechnician } from './types';
-import { HomeIcon, UsersIcon, TruckIcon, WrenchScrewdriverIcon, ShoppingCartIcon, BriefcaseIcon, DocumentTextIcon, CogIcon, ArrowLeftOnRectangleIcon, ChartBarIcon, SunIcon, MoonIcon, LanguageIcon, AdjustmentsHorizontalIcon, CalendarDaysIcon, ArchiveBoxIcon, ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
+import { HomeIcon, UsersIcon, TruckIcon, WrenchScrewdriverIcon, ShoppingCartIcon, BriefcaseIcon, DocumentTextIcon, CogIcon, ArrowLeftOnRectangleIcon, ChartBarIcon, SunIcon, MoonIcon, LanguageIcon, AdjustmentsHorizontalIcon, CalendarDaysIcon, ArchiveBoxIcon, ClipboardDocumentListIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 
 
-export const APP_NAME = "ورشة برو"; // Pro Workshop
-export const APP_NAME_EN = "Workshop Pro";
+export const APP_NAME = "Garage Flow"; // Garage Flow
+export const APP_NAME_EN = "Garage Flow";
 
 export const USER_ROLES_CONFIG = {
   [UserRole.ADMIN]: { name_en: 'Admin', name_ar: 'مدير' },
@@ -24,7 +24,8 @@ export interface NavItem {
 export const NAVIGATION_ITEMS: NavItem[] = [
   { id: 'dashboard', label_en: 'Dashboard', label_ar: 'لوحة التحكم', path: '/', icon: HomeIcon, roles: [UserRole.ADMIN, UserRole.ACCOUNTANT, UserRole.TECHNICIAN] },
   { id: 'customers', label_en: 'Customers', label_ar: 'العملاء', path: '/customers', icon: UsersIcon, roles: [UserRole.ADMIN, UserRole.ACCOUNTANT] },
-  { id: 'suppliers', label_en: 'Suppliers', label_ar: 'الموردين', path: '/suppliers', icon: BriefcaseIcon, roles: [UserRole.ADMIN, UserRole.ACCOUNTANT] }, 
+  { id: 'suppliers', label_en: 'Suppliers', label_ar: 'الموردين', path: '/suppliers', icon: BriefcaseIcon, roles: [UserRole.ADMIN, UserRole.ACCOUNTANT] },
+  { id: 'external-technicians-management', label_en: 'External Technicians', label_ar: 'الفنيين الخارجيين', path: '/external-technicians-management', icon: WrenchScrewdriverIcon, roles: [UserRole.ADMIN] },
   { id: 'vehicles', label_en: 'Vehicles', label_ar: 'السيارات', path: '/vehicles', icon: TruckIcon, roles: [UserRole.ADMIN, UserRole.ACCOUNTANT, UserRole.TECHNICIAN] },
   { id: 'maintenance', label_en: 'Maintenance Cards', label_ar: 'بطاقات الصيانة', path: '/maintenance-cards', icon: WrenchScrewdriverIcon, roles: [UserRole.ADMIN, UserRole.TECHNICIAN] },
   { 
@@ -58,7 +59,6 @@ export const NAVIGATION_ITEMS: NavItem[] = [
   },
   // Expenses section removed as items are moved under Invoicing or handled as Invoice types.
   { id: 'employees', label_en: 'Employees', label_ar: 'الموظفين', path: '/employees', icon: BriefcaseIcon, roles: [UserRole.ADMIN] },
-  { id: 'external-technicians-management', label_en: 'External Technicians', label_ar: 'الفنيين الخارجيين', path: '/external-technicians-management', icon: WrenchScrewdriverIcon, roles: [UserRole.ADMIN] },
   { id: 'reports', label_en: 'Reports', label_ar: 'التقارير', path: '/reports', icon: ChartBarIcon, roles: [UserRole.ADMIN, UserRole.ACCOUNTANT] },
 ];
 
@@ -507,7 +507,7 @@ export const MOCK_WORKSHOP_STATS_PLACEHOLDER: WorkshopStats = {
 };
 
 export const ICONS = {
-    HomeIcon, UsersIcon, TruckIcon, WrenchScrewdriverIcon, ShoppingCartIcon, BriefcaseIcon, DocumentTextIcon, CogIcon, ArrowLeftOnRectangleIcon, ChartBarIcon, SunIcon, MoonIcon, LanguageIcon, AdjustmentsHorizontalIcon, CalendarDaysIcon, ArchiveBoxIcon, ClipboardDocumentListIcon
+    HomeIcon, UsersIcon, TruckIcon, WrenchScrewdriverIcon, ShoppingCartIcon, BriefcaseIcon, DocumentTextIcon, CogIcon, ArrowLeftOnRectangleIcon, ChartBarIcon, SunIcon, MoonIcon, LanguageIcon, AdjustmentsHorizontalIcon, CalendarDaysIcon, ArchiveBoxIcon, ClipboardDocumentListIcon, Bars3Icon, XMarkIcon
 };
 
 export const LANGUAGE_OPTIONS = [
@@ -575,6 +575,8 @@ export const LABELS: Record<string, Record<string, string>> = {
     darkMode: "Dark Mode",
     language: "Language",
     currency: "Currency",
+    expandSidebar: "Expand Sidebar",
+    collapseSidebar: "Collapse Sidebar",
     addNewCustomer: "Add New Customer",
     addNewSupplier: "Add New Supplier",
     customerName: "Customer Name",
@@ -819,6 +821,8 @@ export const LABELS: Record<string, Record<string, string>> = {
     darkMode: "الوضع الداكن",
     language: "اللغة",
     currency: "العملة",
+    expandSidebar: "توسيع القائمة",
+    collapseSidebar: "إغلاق القائمة",
     // Dashboard specific labels
     totalInvoiced: "إجمالي الفواتير",
     totalPaid: "إجمالي المدفوع",

@@ -1,9 +1,7 @@
-
 import React, { useContext, useState, Fragment, useEffect } from 'react';
 import { AppContext } from '../context/AppContext';
 import { SunIcon, MoonIcon, LanguageIcon, CogIcon, UserCircleIcon, ChevronDownIcon, CalendarDaysIcon, BanknotesIcon, GlobeAltIcon, PaintBrushIcon } from '@heroicons/react/24/outline';
 import { LANGUAGE_OPTIONS, THEME_OPTIONS, USER_ROLES_CONFIG, CURRENCY_OPTIONS, ICONS } from '../constants';
-import { Link } from 'react-router-dom';
 import { Menu, Transition, Dialog, Popover } from '@headlessui/react';
 import { DateRange, Currency as CurrencyType } from '../types'; // Renamed to avoid conflict
 import { getTodayRange, getYesterdayRange, getThisWeekRange, getThisMonthRange, getLastMonthRange, getThisYearRange, getAllTimeRange } from '../utils/dateUtils';
@@ -15,7 +13,7 @@ const Header: React.FC = () => {
   const context = useContext(AppContext);
   if (!context) return null;
 
-  const { theme, setTheme, language, setLanguage, getLabel, currentUser, setCurrentUser, dateRange, setDateRange, currency, setCurrency, sidebarCollapsed } = context;
+  const { theme, setTheme, language, setLanguage, getLabel, currentUser, setCurrentUser, dateRange, setDateRange, currency, setCurrency } = context;
 
   const currentThemeOption = THEME_OPTIONS.find(opt => opt.value === theme);
   const currentLanguageOption = LANGUAGE_OPTIONS.find(opt => opt.code === language);
@@ -72,19 +70,9 @@ const Header: React.FC = () => {
 
 
   return (
-    <header className="bg-white dark:bg-secondary-800 shadow-sm p-4 flex justify-between items-center transition-colors duration-300 border-b dark:border-secondary-700">
-      <div className="flex items-center space-x-4 rtl:space-x-reverse">
-        {sidebarCollapsed ? (
-          <img
-            src="/assets/garage-flow-logo.png"
-            alt="Garage Flow Logo"
-            className="w-28 h-10 object-contain"
-          />
-        ) : (
-          <Link to="/" className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-            {getLabel('appName')}
-          </Link>
-        )}
+    <header className="bg-white dark:bg-secondary-800 shadow-sm p-4 flex justify-between items-center transition-colors duration-300">
+      <div className="text-xl font-semibold text-gray-700 dark:text-gray-200">
+        {/* Dynamic page title placeholder */}
       </div>
 
       <div className="flex items-center space-x-2 rtl:space-x-reverse">
@@ -136,92 +124,92 @@ const Header: React.FC = () => {
                 <div className="border-t border-gray-200 dark:border-secondary-600 my-1"></div>
 
                 {/* Theme Switcher */}
-                <Menu.Item>
-                  {({ active }) => (
-                    <Popover className="relative inline-block text-left w-full">
-                      {({ open }) => (
-                        <>
-                          <Popover.Button className={`${ active ? 'bg-gray-100 dark:bg-secondary-600' : '' } group flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200`}>
-                              {currentThemeOption?.icon && <currentThemeOption.icon className="h-5 w-5 me-3 text-gray-500 dark:text-gray-400" />}
-                              {getLabel('theme')}: <span className="ms-1 font-semibold">{currentThemeOption ? (language === 'ar' ? currentThemeOption.name_ar : currentThemeOption.name_en) : ''}</span>
-                              <ChevronDownIcon className={`w-4 h-4 ms-auto transform transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
-                          </Popover.Button>
-                          <Transition as={Fragment} enter="transition ease-out duration-100" enterFrom="opacity-0 translate-y-1" enterTo="opacity-100 translate-y-0" leave="transition ease-in duration-75" leaveFrom="opacity-100 translate-y-0" leaveTo="opacity-0 translate-y-1">
-                            <Popover.Panel className={`absolute top-full mt-1 z-10 w-40 transform rounded-md bg-white dark:bg-secondary-700 shadow-lg ring-1 ring-black dark:ring-secondary-600 ring-opacity-5 ${language === 'ar' ? 'left-0' : 'right-0'}`}>
-                              <div className="py-1">
-                                {THEME_OPTIONS.map((themeOpt) => (
-                                    <button key={themeOpt.value} onClick={() => setTheme(themeOpt.value as Theme)} 
-                                    className={`group flex items-center w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-secondary-600 ${(theme === themeOpt.value) ? 'font-semibold text-primary-600 dark:text-primary-400' : ''}`}>
-                                      <themeOpt.icon className="h-5 w-5 me-2" />
-                                      {language === 'ar' ? themeOpt.name_ar : themeOpt.name_en}
-                                    </button>
-                                ))}
-                              </div>
-                            </Popover.Panel>
-                          </Transition>
-                        </>
-                      )}
-                    </Popover>
+                <Popover className="relative">
+                  {({ open }) => (
+                    <>
+                      <Popover.Button as={Menu.Item} className="w-full">
+                         {({ active }) => (
+                            <button className={`${ active ? 'bg-gray-100 dark:bg-secondary-600' : '' } group flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200`}>
+                                {currentThemeOption?.icon && <currentThemeOption.icon className="h-5 w-5 me-3 text-gray-500 dark:text-gray-400" />}
+                                {getLabel('theme')}: <span className="ms-1 font-semibold">{currentThemeOption ? (language === 'ar' ? currentThemeOption.name_ar : currentThemeOption.name_en) : ''}</span>
+                                <ChevronDownIcon className={`w-4 h-4 ms-auto transform transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+                            </button>
+                         )}
+                      </Popover.Button>
+                      <Transition as={Fragment} enter="transition ease-out duration-100" enterFrom="opacity-0 translate-y-1" enterTo="opacity-100 translate-y-0" leave="transition ease-in duration-75" leaveFrom="opacity-100 translate-y-0" leaveTo="opacity-0 translate-y-1">
+                        <Popover.Panel className={`absolute top-full mt-1 z-10 w-40 transform rounded-md bg-white dark:bg-secondary-700 shadow-lg ring-1 ring-black dark:ring-secondary-600 ring-opacity-5 ${language === 'ar' ? 'left-0' : 'right-0'}`}>
+                           <div className="py-1">
+                            {THEME_OPTIONS.map((themeOpt) => (
+                                <button key={themeOpt.value} onClick={() => setTheme(themeOpt.value as Theme)} 
+                                 className={`group flex items-center w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-secondary-600 ${(theme === themeOpt.value) ? 'font-semibold text-primary-600 dark:text-primary-400' : ''}`}>
+                                  <themeOpt.icon className="h-5 w-5 me-2" />
+                                  {language === 'ar' ? themeOpt.name_ar : themeOpt.name_en}
+                                </button>
+                            ))}
+                          </div>
+                        </Popover.Panel>
+                      </Transition>
+                    </>
                   )}
-                </Menu.Item>
+                </Popover>
 
                 {/* Language Switcher */}
-                <Menu.Item>
-                  {({ active }) => (
-                    <Popover className="relative inline-block text-left w-full">
-                      {({ open }) => (
-                        <>
-                          <Popover.Button className={`${ active ? 'bg-gray-100 dark:bg-secondary-600' : '' } group flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200`}>
-                              <GlobeAltIcon className="h-5 w-5 me-3 text-gray-500 dark:text-gray-400" />
-                              {getLabel('language')}: <span className="ms-1 font-semibold">{currentLanguageOption?.name}</span>
-                              <ChevronDownIcon className={`w-4 h-4 ms-auto transform transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
-                          </Popover.Button>
-                          <Transition as={Fragment} enter="transition ease-out duration-100" enterFrom="opacity-0 translate-y-1" enterTo="opacity-100 translate-y-0" leave="transition ease-in duration-75" leaveFrom="opacity-100 translate-y-0" leaveTo="opacity-0 translate-y-1">
-                            <Popover.Panel className={`absolute top-full mt-1 z-10 w-40 transform rounded-md bg-white dark:bg-secondary-700 shadow-lg ring-1 ring-black dark:ring-secondary-600 ring-opacity-5 ${language === 'ar' ? 'left-0' : 'right-0'}`}>
-                              <div className="py-1">
-                                {LANGUAGE_OPTIONS.map((langOpt) => (
-                                    <button key={langOpt.code} onClick={() => setLanguage(langOpt.code as 'en' | 'ar')} 
-                                    className={`group flex items-center w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-secondary-600 ${(language === langOpt.code) ? 'font-semibold text-primary-600 dark:text-primary-400' : ''}`}>
-                                      {langOpt.name}
-                                    </button>
-                                ))}
-                              </div>
-                            </Popover.Panel>
-                          </Transition>
-                        </>
-                      )}
-                    </Popover>
+                 <Popover className="relative">
+                  {({ open }) => (
+                    <>
+                      <Popover.Button as={Menu.Item} className="w-full">
+                         {({ active }) => (
+                            <button className={`${ active ? 'bg-gray-100 dark:bg-secondary-600' : '' } group flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200`}>
+                                <GlobeAltIcon className="h-5 w-5 me-3 text-gray-500 dark:text-gray-400" />
+                                {getLabel('language')}: <span className="ms-1 font-semibold">{currentLanguageOption?.name}</span>
+                                <ChevronDownIcon className={`w-4 h-4 ms-auto transform transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+                            </button>
+                         )}
+                      </Popover.Button>
+                      <Transition as={Fragment} enter="transition ease-out duration-100" enterFrom="opacity-0 translate-y-1" enterTo="opacity-100 translate-y-0" leave="transition ease-in duration-75" leaveFrom="opacity-100 translate-y-0" leaveTo="opacity-0 translate-y-1">
+                        <Popover.Panel className={`absolute top-full mt-1 z-10 w-40 transform rounded-md bg-white dark:bg-secondary-700 shadow-lg ring-1 ring-black dark:ring-secondary-600 ring-opacity-5 ${language === 'ar' ? 'left-0' : 'right-0'}`}>
+                           <div className="py-1">
+                            {LANGUAGE_OPTIONS.map((langOpt) => (
+                                <button key={langOpt.code} onClick={() => setLanguage(langOpt.code as 'en' | 'ar')} 
+                                 className={`group flex items-center w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-secondary-600 ${(language === langOpt.code) ? 'font-semibold text-primary-600 dark:text-primary-400' : ''}`}>
+                                  {langOpt.name}
+                                </button>
+                            ))}
+                          </div>
+                        </Popover.Panel>
+                      </Transition>
+                    </>
                   )}
-                </Menu.Item>
+                </Popover>
 
                 {/* Currency Switcher */}
-                <Menu.Item>
-                  {({ active }) => (
-                    <Popover className="relative inline-block text-left w-full">
-                      {({ open }) => (
-                        <>
-                          <Popover.Button className={`${ active ? 'bg-gray-100 dark:bg-secondary-600' : '' } group flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200`}>
-                              <BanknotesIcon className="h-5 w-5 me-3 text-gray-500 dark:text-gray-400" />
-                              {getLabel('currency')}: <span className="ms-1 font-semibold">{currentCurrencyOption?.symbol} ({currentCurrencyOption ? (language === 'ar' ? currentCurrencyOption.name_ar : currentCurrencyOption.name_en) : ''})</span>
-                              <ChevronDownIcon className={`w-4 h-4 ms-auto transform transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
-                          </Popover.Button>
-                          <Transition as={Fragment} enter="transition ease-out duration-100" enterFrom="opacity-0 translate-y-1" enterTo="opacity-100 translate-y-0" leave="transition ease-in duration-75" leaveFrom="opacity-100 translate-y-0" leaveTo="opacity-0 translate-y-1">
-                            <Popover.Panel className={`absolute top-full mt-1 z-10 w-52 transform rounded-md bg-white dark:bg-secondary-700 shadow-lg ring-1 ring-black dark:ring-secondary-600 ring-opacity-5 ${language === 'ar' ? 'left-0' : 'right-0'}`}>
-                              <div className="py-1">
-                                {CURRENCY_OPTIONS.map((currOpt) => (
-                                    <button key={currOpt.code} onClick={() => setCurrency(currOpt)} 
-                                    className={`group flex items-center w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-secondary-600 ${(currency.code === currOpt.code) ? 'font-semibold text-primary-600 dark:text-primary-400' : ''}`}>
-                                      {currOpt.symbol} <span className="mx-1">{language === 'ar' ? currOpt.name_ar : currOpt.name_en}</span> ({currOpt.code})
-                                    </button>
-                                ))}
-                              </div>
-                            </Popover.Panel>
-                          </Transition>
-                        </>
-                      )}
-                    </Popover>
+                <Popover className="relative">
+                  {({ open }) => (
+                    <>
+                      <Popover.Button as={Menu.Item} className="w-full">
+                         {({ active }) => (
+                            <button className={`${ active ? 'bg-gray-100 dark:bg-secondary-600' : '' } group flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200`}>
+                                <BanknotesIcon className="h-5 w-5 me-3 text-gray-500 dark:text-gray-400" />
+                                {getLabel('currency')}: <span className="ms-1 font-semibold">{currentCurrencyOption?.symbol} ({currentCurrencyOption ? (language === 'ar' ? currentCurrencyOption.name_ar : currentCurrencyOption.name_en) : ''})</span>
+                                <ChevronDownIcon className={`w-4 h-4 ms-auto transform transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
+                            </button>
+                         )}
+                      </Popover.Button>
+                      <Transition as={Fragment} enter="transition ease-out duration-100" enterFrom="opacity-0 translate-y-1" enterTo="opacity-100 translate-y-0" leave="transition ease-in duration-75" leaveFrom="opacity-100 translate-y-0" leaveTo="opacity-0 translate-y-1">
+                        <Popover.Panel className={`absolute top-full mt-1 z-10 w-52 transform rounded-md bg-white dark:bg-secondary-700 shadow-lg ring-1 ring-black dark:ring-secondary-600 ring-opacity-5 ${language === 'ar' ? 'left-0' : 'right-0'}`}>
+                           <div className="py-1">
+                            {CURRENCY_OPTIONS.map((currOpt) => (
+                                <button key={currOpt.code} onClick={() => setCurrency(currOpt)} 
+                                 className={`group flex items-center w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-secondary-600 ${(currency.code === currOpt.code) ? 'font-semibold text-primary-600 dark:text-primary-400' : ''}`}>
+                                  {currOpt.symbol} <span className="mx-1">{language === 'ar' ? currOpt.name_ar : currOpt.name_en}</span> ({currOpt.code})
+                                </button>
+                            ))}
+                          </div>
+                        </Popover.Panel>
+                      </Transition>
+                    </>
                   )}
-                </Menu.Item>
+                </Popover>
                 
                 <div className="border-t border-gray-200 dark:border-secondary-600 my-1"></div>
                 <Menu.Item>

@@ -18,6 +18,8 @@ export interface AppContextType {
   setDateRange: (dateRange: DateRange) => void;
   currency: Currency;
   setCurrency: (currency: Currency) => void;
+  sidebarCollapsed: boolean;
+  setSidebarCollapsed: (collapsed: boolean) => void;
 }
 
 export const AppContext = createContext<AppContextType | null>(null);
