@@ -37,12 +37,14 @@ const SidebarNavItem: React.FC<{ item: NavItem; isChild?: boolean; collapsed?: b
         end={item.path === '/'} // Use 'end' prop for exact matching on index/home routes in v6
         title={collapsed ? label : undefined}
       >
-        <item.icon className={`w-6 h-6 ${collapsed ? '' : (language === 'ar' ? 'ms-3' : 'mr-3')}`} />
+        <item.icon className={`w-5 h-5 ${collapsed ? '' : (language === 'ar' ? 'ml-3' : 'mr-3')}`} />
         {!collapsed && (
           <>
             <span className="flex-1 whitespace-nowrap">{label}</span>
             {item.children && item.children.length > 0 && (
-              isSubmenuOpen ? <span className="w-4 h-4">^</span> : <span className="w-4 h-4">V</span>
+              <ICONS.ChevronDownIcon
+                className={`w-4 h-4 transition-transform duration-200 ${isSubmenuOpen ? 'rotate-180' : ''} ${language === 'ar' ? 'mr-1' : 'ml-1'}`}
+              />
             )}
           </>
         )}
@@ -86,7 +88,7 @@ const Sidebar: React.FC = () => {
               className={`w-full flex items-center p-2 rounded-lg hover:bg-primary-500 hover:text-white dark:hover:bg-primary-700 transition-colors duration-200 text-gray-700 dark:text-gray-300 ${sidebarCollapsed ? 'justify-center' : ''}`}
               title={sidebarCollapsed ? getLabel('expandSidebar') : getLabel('collapseSidebar')}
             >
-              <ICONS.Bars3Icon className={`w-6 h-6 ${sidebarCollapsed ? '' : (language === 'ar' ? 'ms-3' : 'mr-3')}`} />
+              <ICONS.Bars3Icon className={`w-5 h-5 ${sidebarCollapsed ? '' : (language === 'ar' ? 'ml-3' : 'mr-3')}`} />
               {!sidebarCollapsed && (
                 <span className="flex-1 whitespace-nowrap">
                   {sidebarCollapsed ? getLabel('expandSidebar') : getLabel('collapseSidebar')}
@@ -107,7 +109,7 @@ const Sidebar: React.FC = () => {
             className={`w-full flex items-center p-2 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-red-500 hover:text-white dark:hover:bg-red-700 transition-colors duration-200 ${sidebarCollapsed ? 'justify-center' : ''}`}
             title={sidebarCollapsed ? getLabel('logout') : undefined}
           >
-            <ICONS.ArrowLeftOnRectangleIcon className={`w-6 h-6 ${sidebarCollapsed ? '' : (language === 'ar' ? 'ms-3' : 'mr-3')}`} />
+            <ICONS.PowerIcon className={`w-5 h-5 ${sidebarCollapsed ? '' : (language === 'ar' ? 'ml-3' : 'mr-3')}`} />
             {!sidebarCollapsed && getLabel('logout')}
           </button>
       </div>

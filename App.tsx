@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect, useMemo, useCallback, useContext } from 'react';
-import { HashRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import DashboardPage from './pages/DashboardPage';
 import CustomersPage from './pages/CustomersPage';
@@ -19,7 +19,9 @@ import WorkshopEquipmentPage from './pages/WorkshopEquipmentPage';
 import GeneralExpensesPage from './pages/GeneralExpensesPage';
 import LoginPage from './pages/LoginPage';
 import InventoryIssueRequestsPage from './pages/InventoryIssueRequestsPage'; // Ensured relative path
-import SecondaryWarehousePage from './pages/SecondaryWarehousePage'; 
+import SecondaryWarehousePage from './pages/SecondaryWarehousePage';
+import AttendanceLogPage from './pages/AttendanceLogPage';
+import LeavesAndAbsencesPage from './pages/LeavesAndAbsencesPage';
 import { User, UserRole, DateRange, Currency } from './types';
 import { AppContext, AppContextType, Theme, Language } from './context/AppContext';
 import { MOCK_USERS_DATA, MOCK_LOGGED_IN_USER_ID, LABELS, DEFAULT_CURRENCY, CURRENCY_OPTIONS } from './constants';
@@ -165,6 +167,8 @@ const App: React.FC = () => {
             <Route path="invoices/general" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.ACCOUNTANT]}><GeneralExpensesPage /></ProtectedRoute>} />
 
             <Route path="employees" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><EmployeesPage /></ProtectedRoute>} />
+            <Route path="employees/attendance" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><AttendanceLogPage /></ProtectedRoute>} />
+            <Route path="employees/leaves" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><LeavesAndAbsencesPage /></ProtectedRoute>} />
             <Route path="external-technicians-management" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN]}><ExternalTechniciansManagementPage /></ProtectedRoute>} />
             <Route path="reports" element={<ProtectedRoute allowedRoles={[UserRole.ADMIN, UserRole.ACCOUNTANT]}><ReportsPage /></ProtectedRoute>} />
           </Route>

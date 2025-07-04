@@ -75,14 +75,28 @@ const Header: React.FC = () => {
     <header className="bg-white dark:bg-secondary-800 shadow-sm p-4 flex justify-between items-center transition-colors duration-300 border-b dark:border-secondary-700">
       <div className="flex items-center space-x-4 rtl:space-x-reverse">
         {sidebarCollapsed ? (
-          <img
-            src="/assets/garage-flow-logo.png"
-            alt="Garage Flow Logo"
-            className="w-28 h-10 object-contain"
-          />
+          <div className="flex items-center">
+            <img
+              src="./assets/garage-flow-logo.png"
+              alt="Garage Flow Logo"
+              className="w-8 h-8 object-contain"
+              onError={(e) => {
+                // إذا فشل تحميل اللوغو، اعرض أيقونة بديلة
+                e.currentTarget.style.display = 'none';
+                const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                if (fallback) fallback.style.display = 'block';
+              }}
+            />
+            <div
+              className="w-8 h-8 bg-primary-600 dark:bg-primary-400 rounded-lg flex items-center justify-center text-white font-bold text-sm hidden"
+              style={{ display: 'none' }}
+            >
+              GF
+            </div>
+          </div>
         ) : (
           <Link to="/" className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-            {getLabel('appName')}
+            Garage Flow
           </Link>
         )}
       </div>
@@ -226,7 +240,7 @@ const Header: React.FC = () => {
                 <div className="border-t border-gray-200 dark:border-secondary-600 my-1"></div>
                 <Menu.Item>
                   {({ active }) => (<button onClick={handleLogout} className={`${ active ? 'bg-red-100 dark:bg-red-700' : '' } group flex items-center w-full px-4 py-2 text-sm text-red-700 dark:text-red-300`}>
-                    <ICONS.ArrowLeftOnRectangleIcon className="h-5 w-5 me-3 text-red-500 dark:text-red-400" />
+                    <ICONS.PowerIcon className="h-5 w-5 me-3 text-red-500 dark:text-red-400" />
                     {getLabel('logout')}
                   </button>)}
                 </Menu.Item>

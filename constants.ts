@@ -1,5 +1,5 @@
-import { User, UserRole, Customer, Vehicle, SparePart, Supplier, Employee, MaintenanceCard, Invoice, InvoiceType, WorkshopStats, Currency, FuelLevel, InventoryMovement, InventoryIssueRequest, InventoryIssueRequestStatus, ReplacedPartCondition, SecondaryWarehouseItem, InventoryIssueRequestItem, ReplacedPartEntry, PurchaseInvoice, ExternalTechnician } from './types';
-import { HomeIcon, UsersIcon, TruckIcon, WrenchScrewdriverIcon, ShoppingCartIcon, BriefcaseIcon, DocumentTextIcon, CogIcon, ArrowLeftOnRectangleIcon, ChartBarIcon, SunIcon, MoonIcon, LanguageIcon, AdjustmentsHorizontalIcon, CalendarDaysIcon, ArchiveBoxIcon, ClipboardDocumentListIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { User, UserRole, Customer, Vehicle, SparePart, Supplier, Employee, MaintenanceCard, Invoice, InvoiceType, WorkshopStats, Currency, FuelLevel, InventoryMovement, InventoryIssueRequest, InventoryIssueRequestStatus, ReplacedPartCondition, SecondaryWarehouseItem, PurchaseInvoice, ExternalTechnician } from './types';
+import { HomeIcon, UsersIcon, TruckIcon, WrenchScrewdriverIcon, ShoppingCartIcon, BriefcaseIcon, DocumentTextIcon, CogIcon, PowerIcon, ChartBarIcon, SunIcon, MoonIcon, LanguageIcon, AdjustmentsHorizontalIcon, CalendarDaysIcon, ArchiveBoxIcon, ClipboardDocumentListIcon, Bars3Icon, XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 
 
 export const APP_NAME = "Garage Flow"; // Garage Flow
@@ -58,7 +58,19 @@ export const NAVIGATION_ITEMS: NavItem[] = [
     ]
   },
   // Expenses section removed as items are moved under Invoicing or handled as Invoice types.
-  { id: 'employees', label_en: 'Employees', label_ar: 'الموظفين', path: '/employees', icon: BriefcaseIcon, roles: [UserRole.ADMIN] },
+  {
+    id: 'employee-management',
+    label_en: 'Employee Management',
+    label_ar: 'إدارة الموظفين',
+    path: '/employees',
+    icon: BriefcaseIcon,
+    roles: [UserRole.ADMIN],
+    children: [
+      { id: 'employees', label_en: 'Employees', label_ar: 'الموظفين', path: '/employees', icon: UsersIcon, roles: [UserRole.ADMIN] },
+      { id: 'attendance', label_en: 'Attendance Log', label_ar: 'سجل الدوام', path: '/employees/attendance', icon: CalendarDaysIcon, roles: [UserRole.ADMIN] },
+      { id: 'leaves', label_en: 'Leaves & Absences', label_ar: 'الإجازات والغياب', path: '/employees/leaves', icon: XMarkIcon, roles: [UserRole.ADMIN] },
+    ]
+  },
   { id: 'reports', label_en: 'Reports', label_ar: 'التقارير', path: '/reports', icon: ChartBarIcon, roles: [UserRole.ADMIN, UserRole.ACCOUNTANT] },
 ];
 
@@ -507,7 +519,7 @@ export const MOCK_WORKSHOP_STATS_PLACEHOLDER: WorkshopStats = {
 };
 
 export const ICONS = {
-    HomeIcon, UsersIcon, TruckIcon, WrenchScrewdriverIcon, ShoppingCartIcon, BriefcaseIcon, DocumentTextIcon, CogIcon, ArrowLeftOnRectangleIcon, ChartBarIcon, SunIcon, MoonIcon, LanguageIcon, AdjustmentsHorizontalIcon, CalendarDaysIcon, ArchiveBoxIcon, ClipboardDocumentListIcon, Bars3Icon, XMarkIcon
+    HomeIcon, UsersIcon, TruckIcon, WrenchScrewdriverIcon, ShoppingCartIcon, BriefcaseIcon, DocumentTextIcon, CogIcon, PowerIcon, ChartBarIcon, SunIcon, MoonIcon, LanguageIcon, AdjustmentsHorizontalIcon, CalendarDaysIcon, ArchiveBoxIcon, ClipboardDocumentListIcon, Bars3Icon, XMarkIcon, ChevronDownIcon
 };
 
 export const LANGUAGE_OPTIONS = [
@@ -796,6 +808,34 @@ export const LABELS: Record<string, Record<string, string>> = {
     invoiceTotals: "إجماليات الفاتورة",
     createdBy: "أنشئت بواسطة",
     confirmDelete: "هل أنت متأكد من الحذف؟",
+    addNewEmployee: "Add New Employee",
+    editEmployee: "Edit Employee",
+    role: "Job Title",
+    hireDate: "Hire Date",
+    salary: "Salary",
+    dateOfBirth: "Date of Birth",
+    nationalId: "National ID",
+    personalPhotoUrl: "Personal Photo",
+    idPhotoFrontUrl: "ID Photo (Front)",
+    idPhotoBackUrl: "ID Photo (Back)",
+    maritalStatus: "Marital Status",
+    Single: "Single",
+    Married: "Married",
+    Divorced: "Divorced",
+    Widowed: "Widowed",
+    Other: "Other",
+    gender: "Gender",
+    Male: "Male",
+    Female: "Female",
+    numberOfChildren: "Number of Children",
+    Single_male: "Single",
+    Single_female: "Single",
+    Married_male: "Married",
+    Married_female: "Married",
+    Divorced_male: "Divorced",
+    Divorced_female: "Divorced",
+    Widowed_male: "Widowed",
+    Widowed_female: "Widowed",
   },
   ar: {
     appName: APP_NAME,
@@ -1068,5 +1108,33 @@ export const LABELS: Record<string, Record<string, string>> = {
     confirmDelete: "هل أنت متأكد من الحذف؟",
     serviceDescriptionPlaceholder: "وصف الخدمة أو العمل",
     addItem: "إضافة بند",
+    addNewEmployee: "إضافة موظف جديد",
+    editEmployee: "تعديل موظف",
+    role: "المسمى الوظيفي",
+    hireDate: "تاريخ التعيين",
+    salary: "الراتب",
+    dateOfBirth: "تاريخ الميلاد",
+    nationalId: "الرقم الوطني",
+    personalPhotoUrl: "الصورة الشخصية",
+    idPhotoFrontUrl: "صورة الهوية (الأمام)",
+    idPhotoBackUrl: "صورة الهوية (الخلف)",
+    maritalStatus: "الحالة الاجتماعية",
+    Single: "أعزب/عزباء",
+    Married: "متزوج/متزوجة",
+    Divorced: "مطلق/مطلقة",
+    Widowed: "أرمل/أرملة",
+    Other: "أخرى",
+    gender: "الجنس",
+    Male: "ذكر",
+    Female: "أنثى",
+    numberOfChildren: "عدد الأولاد",
+    Single_male: "أعزب",
+    Single_female: "عزباء",
+    Married_male: "متزوج",
+    Married_female: "متزوجة",
+    Divorced_male: "مطلق",
+    Divorced_female: "مطلقة",
+    Widowed_male: "أرمل",
+    Widowed_female: "أرملة",
   }
 };

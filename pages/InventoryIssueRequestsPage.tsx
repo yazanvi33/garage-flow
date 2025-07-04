@@ -382,7 +382,7 @@ const InventoryIssueRequestsPage: React.FC = () => {
                             dateAdded: new Date().toISOString(),
                             notes: rp.notes || `From IIR: ${updatedRequest.internalId}`,
                         };
-                        console.log("LOG: Item prepared for Secondary Warehouse:", newSecondaryItem);
+                        // TODO: Add item to secondary warehouse
                         // In real app: MOCK_SECONDARY_WAREHOUSE_ITEMS.push(newSecondaryItem); or API call
                     }
                 }
@@ -1014,7 +1014,7 @@ const InventoryIssueRequestsPage: React.FC = () => {
                             <select 
                                 value={rp.inventoryIssueRequestItemId || ''} 
                                 onChange={e => handleReplacedPartInfoChange(index, 'inventoryIssueRequestItemId', e.target.value)} 
-                                className={commonInputStyle}
+                                className={getCommonInputStyle(language)}
                                 disabled={!!rp.customPartName}
                             >
                                 <option value="">{getLabel('selectPart')} (From Issued)</option>
@@ -1030,17 +1030,17 @@ const InventoryIssueRequestsPage: React.FC = () => {
                                 value={rp.customPartName || ''} 
                                 placeholder={language === 'ar' ? "إذا لم يتم الاختيار" : "If not selected"} 
                                 onChange={e => handleReplacedPartInfoChange(index, 'customPartName', e.target.value)} 
-                                className={commonInputStyle} 
+                                className={getCommonInputStyle(language)}
                                 disabled={!!rp.inventoryIssueRequestItemId}
                             />
                         </div>
-                        <div className="col-span-2"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('quantity')}</label><input type="number" value={rp.quantity} min="1" onChange={e => handleReplacedPartInfoChange(index, 'quantity', e.target.value)} className={commonInputStyle} /></div>
+                        <div className="col-span-2"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('quantity')}</label><input type="number" value={rp.quantity} min="1" onChange={e => handleReplacedPartInfoChange(index, 'quantity', e.target.value)} className={getCommonInputStyle(language)} /></div>
                         <div className="col-span-3"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('condition')}</label>
-                            <select value={rp.condition} onChange={e => handleReplacedPartInfoChange(index, 'condition', e.target.value)} className={commonInputStyle}>
+                            <select value={rp.condition} onChange={e => handleReplacedPartInfoChange(index, 'condition', e.target.value)} className={getCommonInputStyle(language)}>
                                 {Object.values(ReplacedPartCondition).map(cond => <option key={cond} value={cond}>{getLabel(cond)}</option>)}
                             </select>
                         </div>
-                        <div className="col-span-11"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('notes')}</label><input type="text" value={rp.notes || ''} onChange={e => handleReplacedPartInfoChange(index, 'notes', e.target.value)} className={commonInputStyle} /></div>
+                        <div className="col-span-11"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('notes')}</label><input type="text" value={rp.notes || ''} onChange={e => handleReplacedPartInfoChange(index, 'notes', e.target.value)} className={getCommonInputStyle(language)} /></div>
                         <div className="col-span-1 flex items-end"><Button type="button" variant="danger" size="sm" onClick={() => removeReplacedPartUi(rp.id)}><TrashIcon className="h-4 w-4"/></Button></div>
                      </div>
                  ))}
@@ -1053,7 +1053,7 @@ const InventoryIssueRequestsPage: React.FC = () => {
                                 const issuedItem = requestToReconcile?.items.find(item => item.id === issuedItemId);
                                 setNewReplacedPartInfo(prev => ({...prev, inventoryIssueRequestItemId: issuedItemId, partId: issuedItem?.partId, customPartName: ''}))
                             }} 
-                            className={commonInputStyle}
+                            className={getCommonInputStyle(language)}
                             disabled={!!newReplacedPartInfo.customPartName}
                         >
                             <option value="">{getLabel('selectPart')} (From Issued)</option>
@@ -1069,17 +1069,17 @@ const InventoryIssueRequestsPage: React.FC = () => {
                             value={newReplacedPartInfo.customPartName || ''} 
                             placeholder={language === 'ar' ? "إذا لم يتم الاختيار" : "If not selected"} 
                             onChange={e => setNewReplacedPartInfo(prev => ({...prev, customPartName: e.target.value, inventoryIssueRequestItemId: undefined, partId: undefined}))} 
-                            className={commonInputStyle} 
+                            className={getCommonInputStyle(language)}
                             disabled={!!newReplacedPartInfo.inventoryIssueRequestItemId}
                         />
                     </div>
-                    <div className="col-span-1"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('quantity')}</label><input type="number" value={newReplacedPartInfo.quantity} min="1" onChange={e => setNewReplacedPartInfo(prev => ({...prev, quantity: parseInt(e.target.value) || 1}))} className={commonInputStyle} /></div>
+                    <div className="col-span-1"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('quantity')}</label><input type="number" value={newReplacedPartInfo.quantity} min="1" onChange={e => setNewReplacedPartInfo(prev => ({...prev, quantity: parseInt(e.target.value) || 1}))} className={getCommonInputStyle(language)} /></div>
                     <div className="col-span-2"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('condition')}</label>
-                        <select value={newReplacedPartInfo.condition} onChange={e => setNewReplacedPartInfo(prev => ({...prev, condition: e.target.value as ReplacedPartCondition}))} className={commonInputStyle}>
+                        <select value={newReplacedPartInfo.condition} onChange={e => setNewReplacedPartInfo(prev => ({...prev, condition: e.target.value as ReplacedPartCondition}))} className={getCommonInputStyle(language)}>
                              {Object.values(ReplacedPartCondition).map(cond => <option key={cond} value={cond}>{getLabel(cond)}</option>)}
                         </select>
                     </div>
-                     <div className="col-span-2"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('notes')}</label><input type="text" value={newReplacedPartInfo.notes || ''} onChange={e => setNewReplacedPartInfo(prev => ({...prev, notes: e.target.value}))} className={commonInputStyle} /></div>
+                     <div className="col-span-2"><label className="text-xs text-gray-700 dark:text-gray-300">{getLabel('notes')}</label><input type="text" value={newReplacedPartInfo.notes || ''} onChange={e => setNewReplacedPartInfo(prev => ({...prev, notes: e.target.value}))} className={getCommonInputStyle(language)} /></div>
                     <div className="col-span-1 flex items-end"><Button type="button" variant="secondary" onClick={addReplacedPartUi} leftIcon={PlusIcon}></Button></div>
                  </div>
                  <div className="pt-4 flex justify-end space-x-3 rtl:space-x-reverse border-t dark:border-secondary-600 mt-4">

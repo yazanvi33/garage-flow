@@ -214,7 +214,7 @@ const Header: React.FC = () => {
                 <div className="border-t border-gray-200 dark:border-secondary-600 my-1"></div>
                 <Menu.Item>
                   {({ active }) => (<button onClick={handleLogout} className={`${ active ? 'bg-red-100 dark:bg-red-700' : '' } group flex items-center w-full px-4 py-2 text-sm text-red-700 dark:text-red-300`}>
-                    <ICONS.ArrowLeftOnRectangleIcon className="h-5 w-5 me-3 text-red-500 dark:text-red-400" />
+                    <ICONS.PowerIcon className="h-5 w-5 me-3 text-red-500 dark:text-red-400" />
                     {getLabel('logout')}
                   </button>)}
                 </Menu.Item>

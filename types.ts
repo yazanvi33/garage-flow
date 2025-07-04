@@ -105,9 +105,19 @@ export interface Employee {
   id: string;
   internalId: string;
   name: string;
-  role: 'Technician' | 'Accountant' | 'Service Advisor' | 'Manager';
+  role: string; // المسمى الوظيفي
   phone: string;
   email?: string;
+  address?: string;
+  dateOfBirth?: string;
+  nationalId?: string;
+  personalPhotoUrl?: string;
+  idPhotoFrontUrl?: string;
+  idPhotoBackUrl?: string;
+  maritalStatus?: 'Single' | 'Married' | 'Divorced' | 'Widowed' | 'Other'; // الحالة الاجتماعية
+  gender?: 'Male' | 'Female';
+  numberOfChildren?: number;
+  notes?: string;
   hireDate: string;
   salary?: number;
 }

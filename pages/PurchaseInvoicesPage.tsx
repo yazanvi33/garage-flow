@@ -254,12 +254,11 @@ const PurchaseInvoicesPage: React.FC = () => {
       // Update parts inventory and purchase prices
       currentItems.forEach(item => {
         // This would normally update the parts in the database
-        // For now, we'll just log the inventory updates needed
-        console.log(`Update part ${item.partId}: +${item.quantity} quantity, purchase price: ${item.unitPrice}`);
+        // TODO: Implement inventory update logic
       });
-      
+
       // Update supplier balance
-      console.log(`Update supplier ${selectedSupplier.id}: +${formData.totalAfterDiscount} due, +${formData.amountPaid} paid`);
+      // TODO: Implement supplier balance update logic
     }
 
     closeModal();
